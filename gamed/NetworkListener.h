@@ -34,6 +34,7 @@ class NetworkListener
 
 		bool initialize(ENetAddress *address, const char *baseKey);
 		void netLoop();
+		PacketHandler* GetPacketHandler();
 
 	private:
 		bool _isAlive;

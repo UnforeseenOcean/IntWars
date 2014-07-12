@@ -19,10 +19,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -77,7 +79,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\gamed\Client.cpp" />
+    <ClCompile Include="..\..\gamed\GameSession.cpp" />
     <ClCompile Include="..\..\gamed\Log.cpp" />
+    <ClCompile Include="..\..\gamed\Map.cpp" />
     <ClCompile Include="..\..\gamed\NetworkListener.cpp" />
     <ClCompile Include="..\..\gamed\Handlers.cpp" />
     <ClCompile Include="..\..\gamed\PacketHandler.cpp" />
@@ -87,6 +92,8 @@
   <ItemGroup>
     <ClInclude Include="..\..\gamed\ChatBox.h" />
     <ClInclude Include="..\..\gamed\Client.h" />
+    <ClInclude Include="..\..\gamed\GameSession.h" />
+    <ClInclude Include="..\..\gamed\Map.h" />
     <ClInclude Include="..\..\gamed\NetworkListener.h" />
     <ClInclude Include="..\..\common.h" />
     <ClInclude Include="..\..\gamed\Log.h" />

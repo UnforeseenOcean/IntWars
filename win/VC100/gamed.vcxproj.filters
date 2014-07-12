@@ -16,6 +16,9 @@
     <Filter Include="Protocol">
       <UniqueIdentifier>{eeac7bfa-3b4f-4c49-987a-ab1bfa6da602}</UniqueIdentifier>
     </Filter>
+    <Filter Include="logic">
+      <UniqueIdentifier>{4d3d70f9-7ac8-4945-a22b-ae0077d5a5b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\gamed\Log.cpp">
@@ -34,6 +37,15 @@
       <Filter>Protocol</Filter>
     </ClCompile>
     <ClCompile Include="..\..\gamed\main.cpp" />
+    <ClCompile Include="..\..\gamed\GameSession.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\Map.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\Client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\gamed\NetworkListener.h">
@@ -59,6 +71,12 @@
     </ClInclude>
     <ClInclude Include="..\..\stdafx.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\Map.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\GameSession.h">
+      <Filter>logic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

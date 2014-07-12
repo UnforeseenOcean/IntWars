@@ -18,10 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _PACKETS_H
 #define _PACKETS_H
 
-#include <enet/enet.h>
+
 #include "common.h"
 #include <time.h>
 #include <intlib/general.h>
+#include <enet/enet.h>
 
 #if defined( __GNUC__ )
 #pragma pack(1)
@@ -474,8 +475,8 @@ struct ChatMessage {
     uint32 unk1;
     uint8 unk2;
 
-    uint32 playerNo;
-    ChatType type;
+	ChatType type;
+    uint32 playerNo;    
     uint32 lenght;
     uint8 unk3[32];
     int8 msg;

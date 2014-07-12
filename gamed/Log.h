@@ -18,6 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _LOG_H
 #define _LOG_H
 
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+#define byte BYTE
+
 #include <Windows.h>
 
 #define LOG_BUFFER_SIZE 1024
@@ -35,7 +42,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define VDEBUG_LOG(LogHandler,buffer,...)
 #endif
 
-using namespace std;
 
 /*
 * This class was made to simplify Logs
@@ -44,6 +50,7 @@ using namespace std;
 * I also made PDEBUG_LOG and VDEBUG_LOG macros to remove some useless message when we'll be in release mode. 
 * SYSTEMTIME is from window's API, , that broke the portability.
 */
+
 
 class Log
 {
@@ -58,7 +65,7 @@ public:
 public:
 	Log();
 	~Log();
-	void setStream(ostream* stream);
+	void setStream(std::ostream* stream);
 	void setOutputFile(const char* path);
 	void writeDate();
 	void writeLine(const char* buffer,...);
@@ -77,7 +84,7 @@ private:
 private:
 	static Log* m_instance;
 	LogType m_type;
-	ostream* m_stream;
+	std::ostream* m_stream;
 	SYSTEMTIME m_time;
 	char m_buffer[LOG_BUFFER_SIZE]; 
 };

@@ -15,6 +15,34 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef _GAME_SESSION_H
+#define _GAME_SESSION_H
+
 #include "stdafx.h"
-#include "Packets.h"
-#include <enet/enet.h>
+#include <vector>
+#include "Map.h"
+
+class ClientInfo;
+class PacketHandler;
+class GameSession
+{
+public:
+	~GameSession();
+
+	static void Init(PacketHandler* packetHandler);
+	static void AddPlayer(ClientInfo* player);
+	static const std::vector<ClientInfo*>& GetPlayerList();
+	static ClientInfo* FindPlayer(uint32 netId);
+	static Map* GetMap();
+
+private:
+	static std::vector<ClientInfo*> m_Players;
+	static Map* m_Map;
+};
+
+inline Map* GameSession::GetMap()
+{
+	return m_Map;
+}
+
+#endif
