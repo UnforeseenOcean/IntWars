@@ -15,6 +15,30 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef _PLAYER_H
+#define _PLAYER_H
+
 #include "stdafx.h"
 #include "Packets.h"
-#include <enet/enet.h>
+
+class ClientInfo;
+class Player
+{
+public:
+	uint64 userId;
+	uint32 netId;
+	uint32 skinId;
+	std::string type;
+	std::string name;
+	uint8 team;
+
+	Player(uint64 userId, uint32 skinId, std::string name, uint8 team);
+	LoadScreenPlayer* GetLoadScreenPlayerName();
+	LoadScreenPlayer* GetLoadScreenPlayerHero();
+	ClientInfo* GetClientInfo();
+};
+
+inline Player::Player(uint64 _userId, uint32 _skinId, std::string _name, uint8 _team) : userId(_userId), skinId(_skinId), name(_name), team(_team)
+{}
+
+#endif

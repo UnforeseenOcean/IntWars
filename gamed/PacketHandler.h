@@ -17,9 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #ifndef _PACKET_HANDLER_H
 #define _PACKET_HANDLER_H
+
+#include "Log.h"
+
 #include <enet/enet.h>
 #include "common.h"
-#include "Log.h"
+
 #include "ChatBox.h"
 
 #include <intlib/base64.h>
@@ -32,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RELIABLE ENET_PACKET_FLAG_RELIABLE
 #define UNRELIABLE 0
 
-#define HANDLE_ARGS ENetPeer *peer, ENetPacket *packet
+#define HANDLE_ARGS ENetPacket *packet
 
 class PacketHandler
 {
@@ -64,7 +67,7 @@ class PacketHandler
 		//Tools
 		void printPacket(uint8 *buf, uint32 len);
 		void printLine(uint8 *buf, uint32 len);
-		bool sendPacket(ENetPeer *peer, uint8 *data, uint32 length, uint8 channelNo, uint32 flag = RELIABLE);
+		bool sendPacket( uint8 *data, uint32 length, uint8 channelNo, uint32 flag = RELIABLE);
 		bool broadcastPacket(uint8 *data, uint32 length, uint8 channelNo, uint32 flag = RELIABLE);
 	private:
 		void registerHandler(bool (PacketHandler::*handler)(HANDLE_ARGS), PacketCmd pktcmd,Channel c);
@@ -72,5 +75,6 @@ class PacketHandler
 		ENetHost *_server;
 		BlowFish *_blowfish;
 		bool (PacketHandler::*_handlerTable[0x100][0x7])(HANDLE_ARGS); 
+		ENetPeer *m_CurrPeer;
 };
 #endif

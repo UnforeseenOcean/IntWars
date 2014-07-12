@@ -15,6 +15,25 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef _MAP_H
+#define _MAP_H
+
 #include "stdafx.h"
-#include "Packets.h"
-#include <enet/enet.h>
+
+class PacketHandler;
+class Map
+{
+public:
+	Map(PacketHandler* packetHandler);
+	bool Init();
+
+private:
+	PacketHandler* m_PacketHandler;
+};
+
+inline Map::Map(PacketHandler* _packetHandler) : m_PacketHandler(_packetHandler)
+{
+
+}
+
+#endif

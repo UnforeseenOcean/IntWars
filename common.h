@@ -27,6 +27,7 @@ enum GameCmd : uint8
 enum PacketCmd : uint8
 {                                               //Channel //Type
 	PKT_KeyCheck = 0x00, //0      //UPDATED  
+	PKT_C2S_ClientConnect_NamedPipe = 0x01,
 
 	PKT_S2C_EndSpawn = 0x11, //? //UPDATED
 	PKT_C2S_QueryStatusReq = 0x14, //1 //UPDATED
@@ -98,8 +99,8 @@ enum MoveType : uint8
 
 enum ChatType : uint32
 {
-	CHAT_ALL = 0,
-	CHAT_TEAM = 1,
+	CHAT_ALL = 1,
+	CHAT_TEAM = 0,
 };
 
 #define CHL_MAX = 7

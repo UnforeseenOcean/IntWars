@@ -16,5 +16,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "stdafx.h"
-#include "Packets.h"
-#include <enet/enet.h>
+#include "Player.h"
+
+
+LoadScreenPlayer* Player::GetLoadScreenPlayerName()
+{
+
+	int8 *n = new int8[name.length()+1];
+	memcpy(n, name.c_str(), name.length()+1);
+	LoadScreenPlayer* p = LoadScreenPlayer::create(PKT_S2C_LoadName, n, name.length());
+	p->userId = userId;
+	return p;
+}
+LoadScreenPlayer* Player::GetLoadScreenPlayerHero()
+{
+	int8 *n = new int8[type.length()+1];
+	memcpy(n, type.c_str(), type.length()+1);
+	LoadScreenPlayer* p = LoadScreenPlayer::create(PKT_S2C_LoadHero, n, type.length());
+	p->userId = userId;
+	p->skinId = skinId;
+	return p;
+}
+
+ClientInfo*
