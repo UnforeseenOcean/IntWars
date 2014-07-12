@@ -18,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "stdafx.h"
 #include "NetworkListener.h"
 #include "Log.h"
-#include "GameSession.h"
-#include "Player.h"
 
 uint32 GetNewNetID() {
 	static DWORD dwStart = 0x40000019;
@@ -61,15 +59,9 @@ bool NetworkListener::initialize(ENetAddress *address, const char *baseKey)
 	return _isAlive = true;
 }
 
-PacketHandler* NetworkListener::GetPacketHandler()
-{
-	return _handler;
-}
-
 void NetworkListener::netLoop()
 {
 	ENetEvent event;
-	Player* p;
 
 	while(enet_host_service(_server, & event, 10) >= 0 && _isAlive)
 	{
@@ -85,11 +77,7 @@ void NetworkListener::netLoop()
 				peerInfo(event.peer)->setName("Test");
 				peerInfo(event.peer)->setType("Teemo");
 				peerInfo(event.peer)->skinNo = 6;
-				peerInfo(event.peer)->team = 0;
 				peerInfo(event.peer)->netId = GetNewNetID();
-				peerInfo(event.peer)->peer = event.peer;
-
-				GameSession::AddPlayer(peerInfo(event.peer));
 
 			break;
 

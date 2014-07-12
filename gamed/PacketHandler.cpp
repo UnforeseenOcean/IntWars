@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 PacketHandler::PacketHandler(ENetHost *server, BlowFish *blowfish)
 {
-	m_CurrPeer = NULL;
 	_server = server;
 	_blowfish = blowfish;
 	memset(_handlerTable,0,sizeof(_handlerTable));
@@ -78,7 +77,7 @@ void PacketHandler::printLine(uint8 *buf, uint32 len)
 	PDEBUG_LOG(Logging,"\n");
 }
 
-bool PacketHandler::sendPacket(uint8 *data, uint32 length, uint8 channelNo, uint32 flag)
+bool PacketHandler::sendPacket(ENetPeer *peer, uint8 *data, uint32 length, uint8 channelNo, uint32 flag)
 {
 	//PDEBUG_LOG_LINE(Logging," Sending packet:\n");
 	//if(length < 300)
@@ -88,7 +87,7 @@ bool PacketHandler::sendPacket(uint8 *data, uint32 length, uint8 channelNo, uint
 		_blowfish->Encrypt(data, length-(length%8)); //Encrypt everything minus the last bytes that overflow the 8 byte boundary
 
 	ENetPacket *packet = enet_packet_create(data, length, flag);
-	if(enet_peer_send(m_CurrPeer, channelNo, packet) < 0)
+	if(enet_peer_send(peer, channelNo, packet) < 0)
 	{
 		PDEBUG_LOG_LINE(Logging,"Warning fail, send!");
 		return false;
@@ -112,7 +111,6 @@ bool PacketHandler::broadcastPacket(uint8 *data, uint32 length, uint8 channelNo,
 
 bool PacketHandler::handlePacket(ENetPeer *peer, ENetPacket *packet, uint8 channelID)
 {
-	m_CurrPeer = peer;
 	if(packet->dataLength >= 8)
 	{
 		if(peerInfo(peer)->keyChecked)
@@ -124,7 +122,7 @@ bool PacketHandler::handlePacket(ENetPeer *peer, ENetPacket *packet, uint8 chann
 	
 	if(handler)
 	{
-		return (*this.*handler)(packet);
+		return (*this.*handler)(peer,packet);
 	}
 	else
 	{

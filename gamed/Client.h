@@ -19,22 +19,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define _CLIENT_H
 
 #include "common.h"
-#include "Packets.h"
 
-class ClientInfo
+struct ClientInfo
 {
-public:
-	ClientInfo();
-	~ClientInfo();
+	ClientInfo()
+	{
+		keyChecked = false;
+		name = type = NULL;
+		ticks = 0;
+		skinNo = 0;
+	}
 
-	void setName(char *name);
-	void setType(char *type);
-	
-	LoadScreenPlayer* GetLoadScreenPlayerName();
-	LoadScreenPlayer* GetLoadScreenPlayerHero();
+	~ClientInfo()
+	{
+		if(name != NULL)
+			delete[] name;
+		if(type != NULL)
+			delete[] type;
+	}
 
-	uint32 getTicks();
+	void setName(char *name)
+	{
+		if(this->name != NULL)
+			delete[] this->name;
 
+		nameLen = strlen(name);
+		this->name = new int8[nameLen+1];
+		memcpy(this->name, name, nameLen+1);
+	}
+
+	void setType(char *type)
+	{
+		if(this->type != NULL)
+			delete[] this->type;
+
+		typeLen = strlen(type);
+		this->type = new int8[typeLen+1];
+		memcpy(this->type, type, typeLen+1);
+	}
+
+	uint32 getTicks()
+	{
+		ticks++;
+		return ticks;
+	}
 	bool keyChecked;
 	uint64 userId;
 	uint32 ticks;
@@ -44,10 +72,8 @@ public:
 	uint32 skinNo;
 	int8 *name;
 	int8 *type;
-	uint8 team;
-	ENetPeer *peer;
-};
 
+};
 #define peerInfo(p) ((ClientInfo*)p->data)
 
 #endif

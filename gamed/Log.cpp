@@ -19,8 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Log.h"
 Log* Log::m_instance;
 
-using namespace std;
-
 Log::Log()
 {
 	m_stream = &cout;

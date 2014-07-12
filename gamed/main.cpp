@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "stdafx.h"
 #include "NetworkListener.h"
 #include "Log.h"
-#include "GameSession.h"
 
 #define SERVER_HOST ENET_HOST_ANY 
 #define SERVER_PORT 5119
@@ -33,12 +32,8 @@ int main(int argc, char ** argv)
 	ENetAddress address;
 	address.host = SERVER_HOST;
 	address.port = SERVER_PORT;
-	
+
 	listener->initialize(&address, SERVER_KEY);
-
-	Logging->writeLine("Initializing GameSession\n");
-	GameSession::Init(listener->GetPacketHandler());
-
 	Logging->writeLine("Starting net loop\n");
 	listener->netLoop();
 	delete listener;
