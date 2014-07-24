@@ -51,3 +51,5 @@ I updated this project on my free time, so anyone who cares can fiddle with it a
 My reddit username is 'imSpudgy', the topic author who posted it to front page is fake, I did not announce this project anywhere.
 
 Uploaded latest binary to BinWars folder.
+
+More contact at irc.ryzon.net #binwars
