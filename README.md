@@ -11,7 +11,8 @@ Content:
 
 Instructions:
 * Run gamed.exe
-* Run the game with this command line: "League of Legends.exe" "8394" "LoLLauncher.exe" "C:/Riot Games/League of Legends/RADS/projects/lol_air_client/releases/0.0.1.79/deploy/LolClient.exe" "127.0.0.1 5119 17BLOhi6KZsTtldTsizvHg== 47917791"
+* Run the game with this command line: "League of Legends.exe" "8394" "LoLLauncher.exe" "C:/Riot Games/League of Legends/RADS/projects/lol_air_client/releases/0.0.1.79/deploy/LolClient.exe" "127.0.0.1 5119 17BLOhi6KZsTtldTsizvHg== 1"
+* 1 Represents the playerID
 
 ~~This is the development part of the [HeroWars](https://github.com/Intline9/HeroWars)  project. Here we can try everything out without worrying with the code base.~~
 
@@ -48,3 +49,5 @@ I updated this project on my free time, so anyone who cares can fiddle with it a
 
 
 My reddit username is 'imSpudgy', the topic author who posted it to front page is fake, I did not announce this project anywhere.
+
+Uploaded latest binary to BinWars folder.
