@@ -1,0 +1,27 @@
+#ifndef _CHAMPION_KHAZIX_H
+#define _CHAMPION_KHAZIX_H
+
+#include "Champion.h"
+
+class Khazix : public Champion {
+
+public:
+   Khazix(Map* map, uint32 id) : Champion("Khazix", map, id) {
+      stats->setCurrentHealth(515.f);
+      stats->setMaxHealth(515.f);
+      stats->setCurrentMana(300.f);
+      stats->setMaxMana(300.f);
+      stats->setBaseAd(53.1f);
+      stats->setRange(125.f);
+      stats->setMovementSpeed(350.f);
+      stats->setArmor(22.f);
+      stats->setMagicArmor(31.25f);
+      stats->setHp5(7.f);
+      stats->setMp5(7.25f);
+	    stats->setBaseSpeed(0.668f)
+   }
+
+
+};
+
+#endif

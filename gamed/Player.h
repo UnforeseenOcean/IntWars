@@ -33,8 +33,6 @@ public:
 	uint8 team;
 
 	Player(uint64 userId, uint32 skinId, std::string name, uint8 team);
-	LoadScreenPlayer* GetLoadScreenPlayerName();
-	LoadScreenPlayer* GetLoadScreenPlayerHero();
 	ClientInfo* GetClientInfo();
 };
 

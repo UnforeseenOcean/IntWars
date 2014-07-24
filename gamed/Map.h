@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define _MAP_H
 
 #include "stdafx.h"
+#include "Object.h"
+#include "Client.h"
 
 class PacketHandler;
 class Map
@@ -26,14 +28,17 @@ class Map
 public:
 	Map(PacketHandler* packetHandler);
 	bool Init();
+	virtual void update(unsigned int diff);
+	Object* getObjectById(uint32 id);
+	void addObject(Object* o);
+
+	const std::map<uint32, Object*>& getObjects() { return objects; }
 
 private:
 	PacketHandler* m_PacketHandler;
+	std::map<uint32, Object*> objects;
 };
 
-inline Map::Map(PacketHandler* _packetHandler) : m_PacketHandler(_packetHandler)
-{
-
-}
+inline Map::Map(PacketHandler* _packetHandler) : m_PacketHandler(_packetHandler){}
 
 #endif

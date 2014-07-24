@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "stdafx.h"
-#include "NetworkListener.h"
+#include "Server.h"
 #include "Log.h"
 #include "GameSession.h"
 
@@ -24,24 +24,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SERVER_PORT 5119
 #define SERVER_KEY "17BLOhi6KZsTtldTsizvHg=="
 
-#define SERVER_VERSION "0.0.2"
+#define SERVER_VERSION "0.0.3"
 
 int main(int argc, char ** argv) 
 {
 	Logging->writeLine("IntWars %s\n",SERVER_VERSION);
-	NetworkListener *listener = new NetworkListener();
+	Server *server = new Server();
 	ENetAddress address;
 	address.host = SERVER_HOST;
 	address.port = SERVER_PORT;
 	
-	listener->initialize(&address, SERVER_KEY);
+	server->initialize(&address, SERVER_KEY);
 
 	Logging->writeLine("Initializing GameSession\n");
-	GameSession::Init(listener->GetPacketHandler());
+	GameSession::Init(server->GetPacketHandler());
 
 	Logging->writeLine("Starting net loop\n");
-	listener->netLoop();
-	delete listener;
+	server->run();
+	delete server;
 
 	Logging->writeLine("Goodbye\n");
 }

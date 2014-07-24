@@ -19,12 +19,15 @@
     <Filter Include="logic">
       <UniqueIdentifier>{4d3d70f9-7ac8-4945-a22b-ae0077d5a5b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="logic\AI">
+      <UniqueIdentifier>{00ef6a24-2e94-4b73-a672-8c29bbbf9488}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="logic\Characters">
+      <UniqueIdentifier>{77ab80e7-98eb-4377-913d-fa74845afb70}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\gamed\Log.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\NetworkListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\gamed\Handlers.cpp">
@@ -46,11 +49,32 @@
     <ClCompile Include="..\..\gamed\Client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\gamed\Object.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\Server.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\Unit.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\Stats.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\Notifiers.cpp">
+      <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\Spell.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\Champion.cpp">
+      <Filter>logic\Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\Minion.cpp">
+      <Filter>logic\Characters</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\gamed\NetworkListener.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -77,6 +101,45 @@
     </ClInclude>
     <ClInclude Include="..\..\gamed\GameSession.h">
       <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\Buffer.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\Unit.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\Object.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\Stats.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\Spell.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\Projectile.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\AI\MinionAI.h">
+      <Filter>logic\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\AI\AI.h">
+      <Filter>logic\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\Server.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\ChampionFactory.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\Champion.h">
+      <Filter>logic\Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\Minion.h">
+      <Filter>logic\Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\MinionStats.h">
+      <Filter>logic\Characters</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

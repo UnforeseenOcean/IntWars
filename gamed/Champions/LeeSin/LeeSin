@@ -1,0 +1,27 @@
+#ifndef _CHAMPION_LEESIN_H
+#define _CHAMPION_LEESIN_H
+
+#include "Champion.h"
+
+class LeeSin : public Champion {
+
+public:
+   LeeSin(Map* map, uint32 id) : Champion("LeeSin", map, id) {
+      stats->setCurrentHealth(513.f);
+      stats->setMaxHealth(513.f);
+      stats->setCurrentMana(200.f);
+      stats->setMaxMana(200.f);
+      stats->setBaseAd(59.f);
+      stats->setRange(125.f);
+      stats->setMovementSpeed(350.f);
+      stats->setArmor(23.7f);
+      stats->setMagicArmor(31.25f);
+      stats->setHp5(6.95f);
+      stats->setMp5(50.f);
+	    stats->setBaseSpeed(0.651f)
+   }
+
+
+};
+
+#endif

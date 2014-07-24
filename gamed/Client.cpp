@@ -21,55 +21,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ClientInfo::ClientInfo()
 {
 	keyChecked = false;
-	name = type = NULL;
 	ticks = 0;
 	skinNo = 0;
 }
 
-ClientInfo::~ClientInfo()
-{
-	if(name != NULL)
-		delete[] name;
-	if(type != NULL)
-		delete[] type;
-}
+ClientInfo::~ClientInfo(){}
 
 void ClientInfo::setName(char *name)
 {
-	if(this->name != NULL)
-		delete[] this->name;
-
-	nameLen = strlen(name);
-	this->name = new int8[nameLen+1];
-	memcpy(this->name, name, nameLen+1);
+	this->name = name;
 }
 
-void ClientInfo::setType(char *type)
+void ClientInfo::setChampion(Champion* champion)
 {
-	if(this->type != NULL)
-		delete[] this->type;
-
-	typeLen = strlen(type);
-	this->type = new int8[typeLen+1];
-	memcpy(this->type, type, typeLen+1);
+	this->champion = champion;
 }
+
+Champion* ClientInfo::getChampion() const { return champion; }
 
 uint32 ClientInfo::getTicks()
 {
 	ticks++;
 	return ticks;
-}
-
-LoadScreenPlayer* ClientInfo::GetLoadScreenPlayerName()
-{
-	LoadScreenPlayer* p = LoadScreenPlayer::create(PKT_S2C_LoadName, name, nameLen);
-	p->userId = userId;
-	return p;
-}
-LoadScreenPlayer* ClientInfo::GetLoadScreenPlayerHero()
-{
-	LoadScreenPlayer* p = LoadScreenPlayer::create(PKT_S2C_LoadHero, type, typeLen);
-	p->userId = userId;
-	p->skinId = skinNo;
-	return p;
 }

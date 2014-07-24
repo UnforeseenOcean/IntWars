@@ -30,6 +30,7 @@ PacketHandler::PacketHandler(ENetHost *server, BlowFish *blowfish)
 	registerHandler(&PacketHandler::handleSpawn,           PKT_C2S_CharLoaded, CHL_C2S);
 	registerHandler(&PacketHandler::handleMap,             PKT_C2S_ClientReady, CHL_LOADING_SCREEN);
 	registerHandler(&PacketHandler::handleSynch,           PKT_C2S_SynchVersion, CHL_C2S);
+	registerHandler(&PacketHandler::handleCastSpell,       PKT_C2S_CastSpell, CHL_C2S);
 	//registerHandler(&PacketHandler::handleGameNumber,      PKT_C2S_GameNumberReq, CHL_C2S);
 	registerHandler(&PacketHandler::handleQueryStatus,     PKT_C2S_QueryStatusReq, CHL_C2S);
 	registerHandler(&PacketHandler::handleStartGame,       PKT_C2S_StartGame, CHL_C2S);
@@ -46,6 +47,7 @@ PacketHandler::PacketHandler(ENetHost *server, BlowFish *blowfish)
 	registerHandler(&PacketHandler::handleBuyItem,		   PKT_C2S_BuyItemReq, CHL_C2S);
 	registerHandler(&PacketHandler::handleNull,            PKT_C2S_LockCamera, CHL_C2S);
 	registerHandler(&PacketHandler::handleNull,            PKT_C2S_StatsConfirm, CHL_C2S);
+	registerHandler(&PacketHandler::handleClick,           PKT_C2S_Click, CHL_C2S);
 	
 }
 
@@ -78,14 +80,14 @@ void PacketHandler::printLine(uint8 *buf, uint32 len)
 	PDEBUG_LOG(Logging,"\n");
 }
 
-bool PacketHandler::sendPacket(uint8 *data, uint32 length, uint8 channelNo, uint32 flag)
+bool PacketHandler::sendPacket(const uint8 *data, uint32 length, uint8 channelNo, uint32 flag)
 {
 	//PDEBUG_LOG_LINE(Logging," Sending packet:\n");
 	//if(length < 300)
 	//	printPacket(data, length);
 
 	if(length >= 8)
-		_blowfish->Encrypt(data, length-(length%8)); //Encrypt everything minus the last bytes that overflow the 8 byte boundary
+		_blowfish->Encrypt((uint8*)data, length-(length%8)); //Encrypt everything minus the last bytes that overflow the 8 byte boundary
 
 	ENetPacket *packet = enet_packet_create(data, length, flag);
 	if(enet_peer_send(m_CurrPeer, channelNo, packet) < 0)
@@ -94,6 +96,10 @@ bool PacketHandler::sendPacket(uint8 *data, uint32 length, uint8 channelNo, uint
 		return false;
 	}
 	return true;
+}
+
+bool PacketHandler::sendPacket(const Packet& packet, uint8 channelNo, uint32 flag) {
+	return sendPacket( (const uint8*)&packet.getBuffer().getBytes()[0], packet.getBuffer().size(), channelNo, flag);
 }
 
 bool PacketHandler::broadcastPacket(uint8 *data, uint32 length, uint8 channelNo, uint32 flag)
@@ -120,6 +126,7 @@ bool PacketHandler::handlePacket(ENetPeer *peer, ENetPacket *packet, uint8 chann
 	}
 
 	PacketHeader *header = reinterpret_cast<PacketHeader*>(packet->data);	
+	printf("Handling OpCode %02X\n", header->cmd);
 	bool (PacketHandler::*handler)(HANDLE_ARGS) = _handlerTable[header->cmd][channelID];
 	
 	if(handler)

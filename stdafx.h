@@ -24,6 +24,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 #include <string>
 
+#include <glm/glm.hpp>
+
 typedef char int8;
 typedef short int16;
 typedef int int32;

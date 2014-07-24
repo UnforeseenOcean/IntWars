@@ -19,33 +19,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define _CLIENT_H
 
 #include "common.h"
-#include "Packets.h"
+#include "ChampionFactory.h"
+#include <string>
 
-class ClientInfo
+struct ClientInfo
 {
 public:
 	ClientInfo();
 	~ClientInfo();
 
 	void setName(char *name);
-	void setType(char *type);
+	void setChampion(Champion* champion);
 	
-	LoadScreenPlayer* GetLoadScreenPlayerName();
-	LoadScreenPlayer* GetLoadScreenPlayerHero();
+	Champion* getChampion() const;
+
+	const std::string& getName() const { return name; }
 
 	uint32 getTicks();
 
 	bool keyChecked;
 	uint64 userId;
 	uint32 ticks;
-	uint32 netId;
-	uint32 nameLen;
-	uint32 typeLen;
 	uint32 skinNo;
-	int8 *name;
-	int8 *type;
+	std::string name;
+	Champion* champion;
 	uint8 team;
-	ENetPeer *peer;
 };
 
 #define peerInfo(p) ((ClientInfo*)p->data)

@@ -1,0 +1,27 @@
+#ifndef _CHAMPION_DRMUNDO_H
+#define _CHAMPION_DRMUNDO_H
+
+#include "Champion.h"
+
+class DrMundo : public Champion {
+
+public:
+   DrMundo(Map* map, uint32 id) : Champion("DrMundo", map, id) {
+      stats->setCurrentHealth(522.f);
+      stats->setMaxHealth(522.f);
+      stats->setCurrentMana(0.f);
+      stats->setMaxMana(0.f);
+      stats->setBaseAd(59.23f);
+      stats->setRange(125.f);
+      stats->setMovementSpeed(345.f);
+      stats->setArmor(24.5f);
+      stats->setMagicArmor(31.25f);
+      stats->setHp5(7.25f);
+      stats->setMp5(0.f);
+	    stats->setBaseSpeed(0.625f)
+   }
+
+
+};
+
+#endif

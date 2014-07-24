@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Map.h"
 
 class ClientInfo;
-class PacketHandler;
+class Server;
 class GameSession
 {
 public:

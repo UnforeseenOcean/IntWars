@@ -56,11 +56,11 @@ const std::vector<ClientInfo*>& GameSession::GetPlayerList()
 	return m_Players;
 }
 
-ClientInfo* GameSession::FindPlayer(uint32 netId)
+ClientInfo* GameSession::FindPlayer(uint32 userId)
 {
 	for(int i=0; i < m_Players.size();i++)
 	{
-		if(m_Players[i]->netId == netId)
+		if(m_Players[i]->userId == userId)
 			return m_Players[i];
 	}
 

@@ -53,19 +53,59 @@ bool Map::Init()
 	//For all players send this info
 	for(int i=0; i < m_players.size();i++)
 	{
-		LoadScreenPlayer* playerName = m_players[i]->GetLoadScreenPlayerName();
-		LoadScreenPlayer* playerHero = m_players[i]->GetLoadScreenPlayerHero();
+		LoadScreenPlayerName playerName(*m_players[i]);
+		LoadScreenPlayerChampion playerHero(*m_players[i]);
 
-		noerr = m_PacketHandler->sendPacket(reinterpret_cast<uint8 *>(playerName), playerName->getPacketLength(), CHL_LOADING_SCREEN);
-		LoadScreenPlayer::destroy(playerName);
+		noerr = m_PacketHandler->sendPacket(playerName, CHL_LOADING_SCREEN);
 		if(!noerr)
 			break;
-		noerr = m_PacketHandler->sendPacket(reinterpret_cast<uint8 *>(playerHero), playerHero->getPacketLength(), CHL_LOADING_SCREEN);	
-		LoadScreenPlayer::destroy(playerHero);
+
+		noerr = m_PacketHandler->sendPacket(playerHero, CHL_LOADING_SCREEN);	
 		if(!noerr)
 			break;
 	}
 	
 	
 	return (pInfo && noerr);
+}
+
+void Map::update(unsigned int diff)
+{
+	for(std::map<uint32, Object*>::iterator kv = objects.begin(); kv != objects.end();) {
+		kv->second->update(diff);
+
+		if(kv->second->isMovementUpdated()) {
+			m_PacketHandler->notifyMovement(kv->second);
+			kv->second->clearMovementUpdated();
+		}
+
+		Unit* u = dynamic_cast<Unit*>(kv->second);
+
+		if(u && !u->getStats().getUpdatedStats().empty()) {
+			m_PacketHandler->notifyUpdatedStats(u);
+			u->getStats().clearUpdatedStats();
+		}
+
+		if(kv->second->isToRemove()) {
+			delete kv->second;
+			kv = objects.erase(kv);
+		} else {
+			++kv;
+		}
+	}
+}
+
+Object* Map::getObjectById(uint32 id) 
+{
+	if(objects.find(id) == objects.end())
+	{
+		return 0;
+	}
+
+	return objects[id];
+}
+
+void Map::addObject(Object* o)
+{
+	objects[o->getNetId()] = o;
 }

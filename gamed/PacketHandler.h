@@ -63,12 +63,22 @@ class PacketHandler
 		bool handleSkillUp(HANDLE_ARGS);
 		bool handleEmotion(HANDLE_ARGS);
 		bool handleBuyItem(HANDLE_ARGS);
+		bool handleCastSpell(HANDLE_ARGS);
+		bool handleClick(HANDLE_ARGS);
 
 		//Tools
 		void printPacket(uint8 *buf, uint32 len);
 		void printLine(uint8 *buf, uint32 len);
-		bool sendPacket( uint8 *data, uint32 length, uint8 channelNo, uint32 flag = RELIABLE);
+		bool sendPacket(const uint8 *data, uint32 length, uint8 channelNo, uint32 flag = RELIABLE);
+		bool sendPacket(const Packet& packet, uint8 channelNo, uint32 flag = RELIABLE);
 		bool broadcastPacket(uint8 *data, uint32 length, uint8 channelNo, uint32 flag = RELIABLE);
+
+		// Notifiers
+		void notifyMinionSpawned(Minion* m);
+		void notifySetHealth(Unit* u);
+		void notifyUpdatedStats(Unit* u);
+		void notifyMovement(Object* o);
+
 	private:
 		void registerHandler(bool (PacketHandler::*handler)(HANDLE_ARGS), PacketCmd pktcmd,Channel c);
 	private:
