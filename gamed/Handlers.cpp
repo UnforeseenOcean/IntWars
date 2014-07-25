@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "GameSession.h"
 #include "Player.h"
 
+#include <sstream>
+
 bool PacketHandler::handleNull(HANDLE_ARGS) {
     return true;
 }
@@ -100,7 +102,7 @@ bool PacketHandler::handleSpawn(HANDLE_ARGS) {
     notifySetHealth(peerInfo(m_CurrPeer)->getChampion());
 
     //Spawn Turrets
-    char *szTurrets[24] = {
+    char *szTurrets[] = {
         "@@Turret_T1_R_03_A",
         "@@Turret_T1_R_02_A",
         "@@Turret_T1_C_07_A",
@@ -175,6 +177,8 @@ bool PacketHandler::handleStartGame(HANDLE_ARGS) {
     test.y = 0;
     test.radius = 1;
     test.unk1 = 2;
+
+	GameSession::started = true;
     //uint8 p[] = {0xC5, 0x19, 0x00, 0x00, 0x40, 0x00, 0x00, 0x50};
     //sendPacket(reinterpret_cast<uint8*>(p), sizeof(p), 3);
     //sendPacket(reinterpret_cast<uint8 *>(&test), sizeof(FogUpdate2), 3);
@@ -359,7 +363,7 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
     ChatMessage *message = reinterpret_cast<ChatMessage *>(packet->data);
     //Lets do commands
     if(message->msg == '.') {
-        const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help" };
+        const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn" };
         //Set field
 		if(strncmp(message->getMessage(), cmd[0], strlen(cmd[0])) == 0) {
 			uint32 blockNo, fieldNo;
@@ -369,6 +373,7 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
 			uint32 mask = 1 << (fieldNo - 1);
 			CharacterStats stats(blockNo, peerInfo(m_CurrPeer)->getChampion()->getNetId(), mask, value);
 			sendPacket(reinterpret_cast<uint8 *>(&stats), sizeof(stats), CHL_LOW_PRIORITY, 2);
+
 			return true;
 		}
         // Set Gold
@@ -376,6 +381,10 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
             float gold = (float)atoi(&message->getMessage()[strlen(cmd[1]) + 1]);
             CharacterStats stats(MM_One, peerInfo(m_CurrPeer)->getChampion()->getNetId(), FM1_Gold, gold);
             sendPacket(reinterpret_cast<uint8 *>(&stats), sizeof(stats), CHL_LOW_PRIORITY, 2);
+
+			std::stringstream ss;
+			ss << peerInfo(m_CurrPeer)->getName() << " set gold to "<< gold;
+			broadcastServerMessage(ss.str());
             /*CharacterStats stats2(MM_One, peerInfo(peer)->netId, FM1_Gold_2, gold);
             sendPacket(peer, reinterpret_cast<uint8 *>(&stats2), sizeof(stats), CHL_LOW_PRIORITY, 2);*/
             return true;
@@ -390,6 +399,10 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
 			printf("Setting speed to %f\n", data);
 
 			peerInfo(m_CurrPeer)->getChampion()->getStats().setMovementSpeed(data);
+
+			std::stringstream ss;
+			ss << peerInfo(m_CurrPeer)->getName() << " set speed to "<< data;
+			broadcastServerMessage(ss.str());
 			return true;
 		}
 
@@ -409,6 +422,10 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
 				GameSession::GetMap()->addObject(m);
 				notifyMinionSpawned(m);
 			}
+
+			std::stringstream ss;
+			ss << peerInfo(m_CurrPeer)->getName() << " spawned minions";
+			broadcastServerMessage(ss.str());
 			return true;
 		}
 
@@ -422,10 +439,18 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
 
 			notifySetHealth(peerInfo(m_CurrPeer)->getChampion());
 
+			std::stringstream ss;
+			ss << peerInfo(m_CurrPeer)->getName() << " set health to " << data;
+			broadcastServerMessage(ss.str());
+
 			return true;
 		}
 
-
+		if((strncmp(message->getMessage(), cmd[4], strlen(cmd[4])) == 0) || strncmp(message->getMessage(), cmd[5], strlen(cmd[5])) == 0 ||
+			strncmp(message->getMessage(), cmd[6], strlen(cmd[6])) == 0 || (strncmp(message->getMessage(), cmd[7], strlen(cmd[7])) == 0))
+		{
+			SendServerMessage("Function not implemented yet! Help us with development or support us: https://github.com/Intline9/IntWars");
+		}
         /*
 
         //experience
@@ -478,6 +503,30 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
 			std::string sModel = (char *)&message->getMessage()[strlen(cmd[8]) + 1];
 			UpdateModel modelPacket(peerInfo(m_CurrPeer)->getChampion()->getNetId(), (char *)sModel.c_str()); //96
 			broadcastPacket(reinterpret_cast<uint8 *>(&modelPacket), sizeof(UpdateModel), CHL_S2C);
+
+			std::stringstream ss;
+			ss << peerInfo(m_CurrPeer)->getName() << " set model to " << sModel;
+			broadcastServerMessage(ss.str());
+
+			return true;
+		}
+
+		//help
+		if(strncmp(message->getMessage(), cmd[9], strlen(cmd[9])) == 0) 
+		{
+			//".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn"
+
+			SendServerMessage(".set [blocknumber] [fieldnumber] [value] - Sets a value in stats field");
+			SendServerMessage(".gold [value] - sets gold");
+			SendServerMessage(".speed [value] - sets movement speed");
+			SendServerMessage(".health [value] - sets max health");
+			SendServerMessage(".xp [value] - sets Experience");
+			SendServerMessage(".ad [value] - sets Attack damage");
+			SendServerMessage(".mana [value] - sets max mana");
+			SendServerMessage(".model [name] - replaces current model with new one");
+			SendServerMessage(".help - opens this help message");
+			SendServerMessage(".spawn - spawns 3 minions per side");
+
 			return true;
 		}
     }
@@ -498,6 +547,7 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
 			{
 				if(players[i]->team == player->team)
 				{
+					//I Think this should be sending to every peer. Currently its sending the same message multiple times to same peer
 					if(!sendPacket(packet->data, packet->dataLength, CHL_COMMUNICATION))
 						return false;
 				}
@@ -566,4 +616,13 @@ bool PacketHandler::handleEmotion(HANDLE_ARGS) {
     response.header.netId = emotion->header.netId;
     response.id = emotion->id;
     return broadcastPacket(reinterpret_cast<uint8 *>(&response), sizeof(response), CHL_S2C);
+}
+
+bool PacketHandler::handleExit(HANDLE_ARGS)
+{
+	enet_peer_disconnect(m_CurrPeer, 0);
+	
+	//Todo: remove player from list or implement behaviour like in original client and move player back to base
+
+	return true;
 }

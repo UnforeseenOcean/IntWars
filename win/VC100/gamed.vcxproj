@@ -124,6 +124,7 @@
     <ClInclude Include="..\..\gamed\Spell.h" />
     <ClInclude Include="..\..\gamed\Stats.h" />
     <ClInclude Include="..\..\gamed\Unit.h" />
+    <ClInclude Include="..\..\gamed\win\platforms-time.h" />
     <ClInclude Include="..\..\stdafx.h" />
   </ItemGroup>
   <ItemGroup>

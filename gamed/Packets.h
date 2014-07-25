@@ -666,6 +666,20 @@ struct ChatMessage {
 	}
 };
 
+struct SystemChatMessage {
+	uint8 cmd;
+	uint32 netId;
+	uint32 unk1;
+	uint8 unk2;
+
+	ChatType type;
+	uint32 playerNo;    
+	uint32 lenght;
+	uint8 unk3[32];
+	int8 msg[255];
+
+};
+
 typedef struct _UpdateModel {
 	_UpdateModel(uint32 netID, const char *szModel) {
 		memset(this, 0, sizeof(_UpdateModel));
@@ -788,7 +802,7 @@ struct TurretSpawn {
     TurretSpawn() {
         header.cmd = PKT_S2C_TurretSpawn;
         tID = 0;
-        memset(&name, 0, 29 + 42); //Set name + type to zero
+        memset(&name, 0, 28 + 42); //Set name + type to zero
     }
 
     PacketHeader header;

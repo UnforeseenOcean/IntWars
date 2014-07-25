@@ -65,6 +65,7 @@ class PacketHandler
 		bool handleBuyItem(HANDLE_ARGS);
 		bool handleCastSpell(HANDLE_ARGS);
 		bool handleClick(HANDLE_ARGS);
+		bool handleExit(HANDLE_ARGS);
 
 		//Tools
 		void printPacket(uint8 *buf, uint32 len);
@@ -78,6 +79,9 @@ class PacketHandler
 		void notifySetHealth(Unit* u);
 		void notifyUpdatedStats(Unit* u);
 		void notifyMovement(Object* o);
+
+		void broadcastServerMessage(std::string msg);
+		void SendServerMessage(std::string msg);
 
 	private:
 		void registerHandler(bool (PacketHandler::*handler)(HANDLE_ARGS), PacketCmd pktcmd,Channel c);

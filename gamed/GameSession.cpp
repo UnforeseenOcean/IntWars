@@ -23,10 +23,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 std::vector<ClientInfo*> GameSession::m_Players;
 Map* GameSession::m_Map = 0;
+bool GameSession::started;
 
 void GameSession::Init(PacketHandler* packetHandler)
 {
 	m_Map = new Map(packetHandler);
+	started = false;
 }
 
 GameSession::~GameSession()
@@ -49,6 +51,7 @@ void GameSession::AddPlayer(ClientInfo* player)
 		return;
 	}
 	m_Players.push_back(player);
+	m_Map->addObject(player->getChampion());
 }
 
 const std::vector<ClientInfo*>& GameSession::GetPlayerList()

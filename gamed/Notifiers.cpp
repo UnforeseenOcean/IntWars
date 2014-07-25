@@ -29,7 +29,7 @@ void PacketHandler::notifyMovement(Object* o) {
 	for(int i = 0; i < waypoints.size(); i++) {
 		printf("     Vector %i, x: %f, y: %f\n", i, 2.0 * waypoints[i].x + MAP_WIDTH, 2.0 * waypoints[i].y + MAP_HEIGHT);
 	}
-
+	
 	answer->nbUpdates = 1;
 	answer->netId = o->getNetId();
 	for(int i = 0; i < waypoints.size(); i++) {

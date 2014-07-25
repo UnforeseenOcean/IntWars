@@ -34,7 +34,7 @@ PacketHandler::PacketHandler(ENetHost *server, BlowFish *blowfish)
 	//registerHandler(&PacketHandler::handleGameNumber,      PKT_C2S_GameNumberReq, CHL_C2S);
 	registerHandler(&PacketHandler::handleQueryStatus,     PKT_C2S_QueryStatusReq, CHL_C2S);
 	registerHandler(&PacketHandler::handleStartGame,       PKT_C2S_StartGame, CHL_C2S);
-	registerHandler(&PacketHandler::handleNull,            PKT_C2S_Exit, CHL_C2S);
+	registerHandler(&PacketHandler::handleExit,            PKT_C2S_Exit, CHL_C2S);
 	registerHandler(&PacketHandler::handleView,            PKT_C2S_ViewReq, CHL_C2S);
 	registerHandler(&PacketHandler::handleNull,            PKT_C2S_Click, CHL_C2S);
 	//registerHandler(&PacketHandler::handleNull,            PKT_C2S_OpenShop, CHL_C2S);
@@ -139,4 +139,38 @@ bool PacketHandler::handlePacket(ENetPeer *peer, ENetPacket *packet, uint8 chann
 		printPacket(packet->data, packet->dataLength);
 	}
 	return false;	
+}
+
+void PacketHandler::broadcastServerMessage(std::string msg)
+{
+	//This is kind of an very ugly hack! Could cause memory leaks :/
+	SystemChatMessage packet;
+	packet.cmd = PKT_ChatBoxMessage;
+	packet.lenght = msg.length();
+	
+	strcpy(packet.msg,msg.c_str());
+
+	packet.netId = 0;
+	packet.playerNo = 0;
+	packet.type = CHAT_ALL;
+
+	broadcastPacket(reinterpret_cast<uint8*>(&packet), sizeof(packet), CHL_COMMUNICATION);
+	
+}
+
+void PacketHandler::SendServerMessage(std::string msg)
+{
+	//This is kind of an very ugly hack! Could cause memory leaks :/
+	SystemChatMessage packet;
+	packet.cmd = PKT_ChatBoxMessage;
+	packet.lenght = msg.length();
+
+	strcpy(packet.msg,msg.c_str());
+
+	packet.netId = 0;
+	packet.playerNo = 0;
+	packet.type = CHAT_TEAM;
+
+	sendPacket(reinterpret_cast<uint8*>(&packet), sizeof(packet), CHL_COMMUNICATION);
+
 }

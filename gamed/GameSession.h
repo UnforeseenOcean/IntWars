@@ -35,6 +35,8 @@ public:
 	static ClientInfo* FindPlayer(uint32 netId);
 	static Map* GetMap();
 
+	static bool started;
+
 private:
 	static std::vector<ClientInfo*> m_Players;
 	static Map* m_Map;

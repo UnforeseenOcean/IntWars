@@ -22,6 +22,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "ChampionFactory.h"
 #include "Player.h"
 
+#if defined(WIN32) || defined(_WIN32)
+#include "win/platforms-time.h"
+#else
+#include <sys/time.h>
+#endif
+
+
+#define REFRESH_RATE 5
+
 uint32 GetNewNetID() {
 	static uint32 dwStart = 0x40000019;
 	uint32 dwRet = dwStart;
@@ -71,6 +80,9 @@ void Server::run()
 {
 	ENetEvent event;
 	Player* p;
+	struct timeval tStart, tEnd, tDiff;
+	tStart.tv_sec = 0;
+	tStart.tv_usec = 0;
 
 	while(enet_host_service(_host, & event, 10) >= 0 && _isAlive)
 	{
@@ -109,5 +121,14 @@ void Server::run()
 			delete (ClientInfo*)event.peer->data;
 		break;
 		}
+
+
+		tEnd = tStart;
+		gettimeofday(&tStart, 0);
+		timersub(&tStart, &tEnd, &tDiff);
+		if(GameSession::started) {
+			GameSession::GetMap()->update(tDiff.tv_sec*1000 + tDiff.tv_usec/1000);
+		}
+		usleep(REFRESH_RATE*1000);
 	}
 }
