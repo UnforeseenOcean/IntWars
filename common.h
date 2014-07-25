@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 enum GameCmd : uint8
 {
-	PKT_S2C_MoveAns                 = 0x60,
+	PKT_S2C_MoveAns                 = 0x61,
 };
 
 //Currently attuned to Live 4.12.0.356
