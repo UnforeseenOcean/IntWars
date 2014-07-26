@@ -438,6 +438,7 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
 			peerInfo(m_CurrPeer)->getChampion()->getStats().setMaxHealth(data);
 
 			notifySetHealth(peerInfo(m_CurrPeer)->getChampion());
+			
 
 			std::stringstream ss;
 			ss << peerInfo(m_CurrPeer)->getName() << " set health to " << data;
@@ -445,12 +446,12 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
 
 			return true;
 		}
-
+		
 		if((strncmp(message->getMessage(), cmd[4], strlen(cmd[4])) == 0) || strncmp(message->getMessage(), cmd[5], strlen(cmd[5])) == 0 ||
 			strncmp(message->getMessage(), cmd[6], strlen(cmd[6])) == 0 || (strncmp(message->getMessage(), cmd[7], strlen(cmd[7])) == 0))
 		{
 			SendServerMessage("Function not implemented yet! Help us with development or support us: https://github.com/Intline9/IntWars");
-		}
+		}				
         /*
 
         //experience
@@ -485,19 +486,20 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
         Logging->writeLine("set champ attack damage to %f\n", data);
         sendPacket(peer,reinterpret_cast<uint8*>(&charStats),sizeof(charStats), CHL_LOW_PRIORITY, 2);
         return true;
-        }
-        //Mana
+        }        
+		//Mana
         if(strncmp(message->getMessage(), cmd[7], strlen(cmd[7])) == 0)
         {
-        float data = (float)atoi(&message->getMessage()[strlen(cmd[7])+1]);
+			float data = (float)atoi(&message->getMessage()[strlen(cmd[7])+1]);
 
-        charStats.statType = STI_Mana;
-        charStats.statValue = data;
-        Logging->writeLine("set champ mana to %f\n", data);
-        sendPacket(peer,reinterpret_cast<uint8*>(&charStats),sizeof(charStats), CHL_LOW_PRIORITY, 2);
-        return true;
+			peerInfo(m_CurrPeer)->getChampion()->getStats().setCurrentMana(data);
+			peerInfo(m_CurrPeer)->getChampion()->getStats().setMaxMana(data);
+			
+			notifySetMana(peerInfo(m_CurrPeer)->getChampion());
+			return true;
         }
         */
+		
         //Model
 		if(strncmp(message->getMessage(), cmd[8], strlen(cmd[8])) == 0) {
 			std::string sModel = (char *)&message->getMessage()[strlen(cmd[8]) + 1];

@@ -241,7 +241,7 @@ public:
 };
 
 class SetHealth : public BasePacket {
-public:
+public:	
 	SetHealth(Unit* u) : BasePacket(PKT_S2C_SetHealth, u->getNetId()) {
 		buffer << (uint16)0x0000; // unk
 		buffer << u->getStats().getCurrentHealth();

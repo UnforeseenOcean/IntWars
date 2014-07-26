@@ -22,13 +22,7 @@ public:
     * Called when the character casts the spell
     */
    virtual bool cast(float x, float y, Unit* u = 0);
-   
-   /**
-    * Called when the spell is finished casting and we're supposed to do things
-    * such as projectile spawning, etc.
-    */
-   virtual void finishCasting();
-   
+      
    /**
     * Called every diff milliseconds to update the spell
     */
@@ -51,8 +45,7 @@ public:
    /**
     * TODO : Add in CDR % from champion's stat
     */
-   float getCooldown() const { 
-      return 0; // TODO : remove this 
+   float getCooldown() const {       
       if(!level) {
          return 0;
       }
@@ -63,7 +56,6 @@ public:
     * @return the mana/energy/health cost
     */
    float getCost() const {
-      return 0; // TODO : remove this 
       if(!level) {
          return 0;
       }
