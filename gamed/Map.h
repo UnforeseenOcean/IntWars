@@ -31,6 +31,7 @@ public:
 	virtual void update(unsigned int diff);
 	Object* getObjectById(uint32 id);
 	void addObject(Object* o);
+	void RemoveAllObjects();
 
 	const std::map<uint32, Object*>& getObjects() { return objects; }
 

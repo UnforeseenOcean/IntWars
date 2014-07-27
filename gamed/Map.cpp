@@ -20,6 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "PacketHandler.h"
 #include "GameSession.h"
 
+#include <algorithm>
+
 bool Map::Init()
 {	
 	int blueTeam=0;
@@ -31,7 +33,7 @@ bool Map::Init()
 	//Builds team info
 	for(int i=0; i < m_players.size();i++)
 	{
-		if(m_players[i]->team == 0)
+		if(m_players[i]->team == TEAM_BLUE)
 		{
 			blueTeam++;
 			screenInfo.bluePlayerIds[i] = m_players[i]->userId;
@@ -81,9 +83,9 @@ void Map::update(unsigned int diff)
 
 		Unit* u = dynamic_cast<Unit*>(kv->second);
 
-		if(u && !u->getStats().getUpdatedStats().empty()) {
+		if(u && !u->getStats()->getUpdatedStats().empty()) {
 			m_PacketHandler->notifyUpdatedStats(u);
-			u->getStats().clearUpdatedStats();
+			u->getStats()->clearUpdatedStats();
 		}
 
 		if(kv->second->isToRemove()) {
@@ -94,6 +96,14 @@ void Map::update(unsigned int diff)
 		}
 	}
 }
+
+void Map::RemoveAllObjects()
+{
+	for(std::map<uint32, Object*>::iterator kv = objects.begin(); kv != objects.end();) {
+		kv->second->setToRemove();
+	}
+}
+
 
 Object* Map::getObjectById(uint32 id) 
 {

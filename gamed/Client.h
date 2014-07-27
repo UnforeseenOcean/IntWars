@@ -22,6 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "ChampionFactory.h"
 #include <string>
 
+enum TeamId 
+{
+	TEAM_BLUE = 0x64,
+	TEAM_PURPLE = 0x65
+};
+
 struct ClientInfo
 {
 public:
@@ -30,10 +36,20 @@ public:
 
 	void setName(char *name);
 	void setChampion(Champion* champion);
-	
+	void setSkinNo(uint32 skinNo);
+
+	void setSummoners(uint32 sum1, uint32 sum2) {
+		summonerSkills[0] = sum1;
+		summonerSkills[1] = sum2;
+	}
+
+
 	Champion* getChampion() const;
 
 	const std::string& getName() const { return name; }
+	const std::string& getRank() const { return rank; }
+	uint32 getTeam() const { return team; }
+	uint32 getSkinNo() const { return skinNo; }
 
 	uint32 getTicks();
 
@@ -41,9 +57,12 @@ public:
 	uint64 userId;
 	uint32 ticks;
 	uint32 skinNo;
-	std::string name;
+	uint32 summonerSkills[2];
+	std::string name, rank;
+	TeamId team;
+
 	Champion* champion;
-	uint8 team;
+	
 };
 
 #define peerInfo(p) ((ClientInfo*)p->data)

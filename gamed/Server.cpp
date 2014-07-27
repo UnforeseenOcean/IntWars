@@ -97,8 +97,8 @@ void Server::run()
 				event.peer->data = new ClientInfo();
 				peerInfo(event.peer)->setName("Test");
 				peerInfo(event.peer)->setChampion(ChampionFactory::getChampionFromType("Ezreal", GameSession::GetMap(), GetNewNetID()));
-				peerInfo(event.peer)->skinNo = 6;
-				peerInfo(event.peer)->team = 0;
+				peerInfo(event.peer)->setSkinNo(6);
+				peerInfo(event.peer)->setSummoners(SPL_Ignite, SPL_Flash);
 
 				GameSession::AddPlayer(peerInfo(event.peer));
 
@@ -117,6 +117,7 @@ void Server::run()
 		case ENET_EVENT_TYPE_DISCONNECT:
 			Logging->writeLine("Client disconnected: %i.%i.%i.%i:%i \n", event.peer->address.host & 0xFF, (event.peer->address.host >> 8) & 0xFF, (event.peer->address.host >> 16) & 0xFF, (event.peer->address.host >> 24) & 0xFF, event.peer->address.port);
 
+			GameSession::RemovePlayer(peerInfo(event.peer)); //Actually we should create a behaviour like in the original client and replace player with AI or port him back
 			/* Cleanup */
 			delete (ClientInfo*)event.peer->data;
 		break;

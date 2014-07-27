@@ -22,5 +22,5 @@ void Unit::update(unsigned int diff) {
 }
 
 void Unit::dealDamageTo(Unit* target, float damage, DamageType type, DamageSource source) {
-	target->getStats().setCurrentHealth(max(0.f, target->getStats().getCurrentHealth()-damage));
+	target->getStats()->setCurrentHealth(max(0.f, target->getStats()->getCurrentHealth()-damage));
 }

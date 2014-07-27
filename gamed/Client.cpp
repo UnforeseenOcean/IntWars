@@ -23,9 +23,16 @@ ClientInfo::ClientInfo()
 	keyChecked = false;
 	ticks = 0;
 	skinNo = 0;
+	rank = "GOLD";
+	team = TEAM_BLUE;
+	champion = 0;
 }
 
-ClientInfo::~ClientInfo(){}
+ClientInfo::~ClientInfo()
+{
+	delete champion;
+	champion = 0;
+}
 
 void ClientInfo::setName(char *name)
 {
@@ -43,4 +50,9 @@ uint32 ClientInfo::getTicks()
 {
 	ticks++;
 	return ticks;
+}
+
+void ClientInfo::setSkinNo(uint32 skinNo)
+{
+	this->skinNo = skinNo;
 }

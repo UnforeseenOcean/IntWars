@@ -1,7 +1,12 @@
 #ifndef _CHAMPION_FACTORY_H
 #define _CHAMPION_FACTORY_H
 
+#include "Champions/Corki/Corki.h"
 #include "Champions/Ezreal/Ezreal.h"
+#include "Champions/Jinx/Jinx.h"
+#include "Champions/Teemo/Teemo.h"
+#include "Champions/Tryndamere/Tryndamere.h"
+#include "Champions/Vayne/Vayne.h"
 #include "Champions/Annie/Annie.h"
 
 class ChampionFactory {
@@ -20,6 +25,21 @@ public:
 	  if(type == "Annie")
 	  {
 		  return new Annie(map, id);
+	  }
+	  if(type == "Corki") {
+		  return new Corki(map, id);
+	  }
+	  if(type == "Jinx") {
+		  return new Jinx(map, id);
+	  }
+	  if(type == "Teemo") {
+		  return new Teemo(map, id);
+	  }
+	  if(type == "Tryndamere") {
+		  return new Tryndamere(map, id);
+	  }
+	  if(type == "Vayne") {
+		  return new Vayne(map, id);
 	  }
       
       return new Champion(type, map, id);

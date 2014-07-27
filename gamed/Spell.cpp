@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Spell.h"
+#include "Stats.h"
+#include "Champion.h"
 
 /**
  * Called when the character casts the spell
@@ -11,6 +13,7 @@ bool Spell::cast(float x, float y, Unit* u) {
    this->x = x;
    this->y = y;
    this->target = u;
+
    
    return true;
 }

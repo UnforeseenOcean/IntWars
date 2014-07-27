@@ -67,12 +67,9 @@ bool PacketHandler::handleGameNumber(HANDLE_ARGS) {
 bool PacketHandler::handleSynch(HANDLE_ARGS) {
     SynchVersion *version = reinterpret_cast<SynchVersion *>(packet->data);
     Logging->writeLine("Client version: %s\n", version->version);
-    SynchVersionAns answer;
-    answer.mapId = 1;
-    answer.players[0].userId = peerInfo(m_CurrPeer)->userId;
-    answer.players[0].skill1 = SPL_Ignite;
-    answer.players[0].skill2 = SPL_Flash;
-    return sendPacket(reinterpret_cast<uint8 *>(&answer), sizeof(SynchVersionAns), 3);
+    SynchVersionAns answer(GameSession::GetPlayerList(),"Version 4.12.0.356 [PUBLIC]", "CLASSIC");
+	printPacket(reinterpret_cast<uint8 *>(&answer), sizeof(answer));
+    return sendPacket(answer, 3);
 }
 
 bool PacketHandler::handleMap(HANDLE_ARGS) {
@@ -363,24 +360,37 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
     ChatMessage *message = reinterpret_cast<ChatMessage *>(packet->data);
     //Lets do commands
     if(message->msg == '.') {
-        const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn" };
+        const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn", ".cooldown" };
         //Set field
 		if(strncmp(message->getMessage(), cmd[0], strlen(cmd[0])) == 0) {
-			uint32 blockNo, fieldNo;
+			char tfield[255];
 			float value;
-			sscanf(&message->getMessage()[strlen(cmd[0])+1], "%u %u %f", &blockNo, &fieldNo, &value);
-			blockNo = 1 << (blockNo - 1);
-			uint32 mask = 1 << (fieldNo - 1);
-			CharacterStats stats(blockNo, peerInfo(m_CurrPeer)->getChampion()->getNetId(), mask, value);
-			sendPacket(reinterpret_cast<uint8 *>(&stats), sizeof(stats), CHL_LOW_PRIORITY, 2);
+			sscanf(&message->getMessage()[strlen(cmd[0])+1], "%s %f", tfield, &value);
+			std::string field(tfield);
 
+			if(field == "armor")
+			{
+				peerInfo(m_CurrPeer)->getChampion()->getStats()->setArmor(value);
+				return true;
+			}
+			if(field == "magicarmor")
+			{
+				peerInfo(m_CurrPeer)->getChampion()->getStats()->setMagicArmor(value);
+				return true;
+			}
+			//TODO: Finish this :)
+
+
+			std::stringstream ss;
+			ss << "Unknown field '" << field << "'";
+			broadcastServerMessage(ss.str());
+			
 			return true;
 		}
         // Set Gold
         if(strncmp(message->getMessage(), cmd[1], strlen(cmd[1])) == 0) {
             float gold = (float)atoi(&message->getMessage()[strlen(cmd[1]) + 1]);
-            CharacterStats stats(MM_One, peerInfo(m_CurrPeer)->getChampion()->getNetId(), FM1_Gold, gold);
-            sendPacket(reinterpret_cast<uint8 *>(&stats), sizeof(stats), CHL_LOW_PRIORITY, 2);
+            peerInfo(m_CurrPeer)->getChampion()->getStats()->setGold(gold);
 
 			std::stringstream ss;
 			ss << peerInfo(m_CurrPeer)->getName() << " set gold to "<< gold;
@@ -390,6 +400,17 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
             return true;
         }
 
+		if(strncmp(message->getMessage(), cmd[11], strlen(cmd[11])) == 0)
+		{
+			uint32 spellNo;
+			float value;
+
+			sscanf(&message->getMessage()[strlen(cmd[11])+1], "%u %f", &spellNo, &value);
+			Spell* s = peerInfo(m_CurrPeer)->getChampion()->GetSpell(spellNo-1);
+			s->setCooldown(s->getLevel(),value);
+			
+		}
+
 
 		//movement
 		if(strncmp(message->getMessage(), cmd[2], strlen(cmd[2])) == 0)
@@ -398,7 +419,7 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
 
 			printf("Setting speed to %f\n", data);
 
-			peerInfo(m_CurrPeer)->getChampion()->getStats().setMovementSpeed(data);
+			peerInfo(m_CurrPeer)->getChampion()->getStats()->setMovementSpeed(data);
 
 			std::stringstream ss;
 			ss << peerInfo(m_CurrPeer)->getName() << " set speed to "<< data;
@@ -434,8 +455,8 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
 		{
 			float data = (float)atoi(&message->getMessage()[strlen(cmd[3])+1]);
 
-			peerInfo(m_CurrPeer)->getChampion()->getStats().setCurrentHealth(data);
-			peerInfo(m_CurrPeer)->getChampion()->getStats().setMaxHealth(data);
+			peerInfo(m_CurrPeer)->getChampion()->getStats()->setCurrentHealth(data);
+			peerInfo(m_CurrPeer)->getChampion()->getStats()->setMaxHealth(data);
 
 			notifySetHealth(peerInfo(m_CurrPeer)->getChampion());
 			
@@ -447,24 +468,55 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
 			return true;
 		}
 		
-		if((strncmp(message->getMessage(), cmd[4], strlen(cmd[4])) == 0) || strncmp(message->getMessage(), cmd[5], strlen(cmd[5])) == 0 ||
-			strncmp(message->getMessage(), cmd[6], strlen(cmd[6])) == 0 || (strncmp(message->getMessage(), cmd[7], strlen(cmd[7])) == 0))
+		if( strncmp(message->getMessage(), cmd[5], strlen(cmd[5])) == 0 )
 		{
 			SendServerMessage("Function not implemented yet! Help us with development or support us: https://github.com/Intline9/IntWars");
-		}				
-        /*
+		}
+
+		//mana
+		if(strncmp(message->getMessage(), cmd[7], strlen(cmd[7])) == 0)
+		{
+			float data = (float)atoi(&message->getMessage()[strlen(cmd[7])+1]);
+
+			peerInfo(m_CurrPeer)->getChampion()->getStats()->setCurrentMana(data);
+			peerInfo(m_CurrPeer)->getChampion()->getStats()->setMaxMana(data);
+
+			std::stringstream ss;
+			ss << peerInfo(m_CurrPeer)->getName() << " set mana to " << data;
+			broadcastServerMessage(ss.str());
+
+			return true;
+		}
+        
 
         //experience
         if(strncmp(message->getMessage(), cmd[4], strlen(cmd[4])) == 0)
         {
-        float data = (float)atoi(&message->getMessage()[strlen(cmd[4])+1]);
+			float data = (float)atoi(&message->getMessage()[strlen(cmd[4])+1]);
 
-        charStats.statType = STI_Exp;
-        charStats.statValue = data;
-        Logging->writeLine("set champ exp to %f\n", data);
-        sendPacket(peer,reinterpret_cast<uint8*>(&charStats),sizeof(charStats), CHL_LOW_PRIORITY, 2);
-        return true;
+			peerInfo(m_CurrPeer)->getChampion()->getStats()->setExp(data);
+
+			std::stringstream ss;
+			ss << peerInfo(m_CurrPeer)->getName() << " set Exp to " << data;
+			broadcastServerMessage(ss.str());
+
+			return true;
         }
+
+		//Attack damage
+		if(strncmp(message->getMessage(), cmd[6], strlen(cmd[6])) == 0)
+		{
+			float data = (float)atoi(&message->getMessage()[strlen(cmd[6])+1]);
+
+			peerInfo(m_CurrPeer)->getChampion()->getStats()->setBaseAd(data);
+
+			std::stringstream ss;
+			ss << peerInfo(m_CurrPeer)->getName() << " set Attack damage to " << data;
+			broadcastServerMessage(ss.str());
+			return true;
+		}        
+
+		/*
         //AbilityPower
         if(strncmp(message->getMessage(), cmd[5], strlen(cmd[5])) == 0)
         {
@@ -476,28 +528,7 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
         sendPacket(peer,reinterpret_cast<uint8*>(&charStats),sizeof(charStats), CHL_LOW_PRIORITY, 2);
         return true;
         }
-        //Attack damage
-        if(strncmp(message->getMessage(), cmd[6], strlen(cmd[6])) == 0)
-        {
-        float data = (float)atoi(&message->getMessage()[strlen(cmd[6])+1]);
-
-        charStats.statType = STI_AttackDamage;
-        charStats.statValue = data;
-        Logging->writeLine("set champ attack damage to %f\n", data);
-        sendPacket(peer,reinterpret_cast<uint8*>(&charStats),sizeof(charStats), CHL_LOW_PRIORITY, 2);
-        return true;
-        }        
-		//Mana
-        if(strncmp(message->getMessage(), cmd[7], strlen(cmd[7])) == 0)
-        {
-			float data = (float)atoi(&message->getMessage()[strlen(cmd[7])+1]);
-
-			peerInfo(m_CurrPeer)->getChampion()->getStats().setCurrentMana(data);
-			peerInfo(m_CurrPeer)->getChampion()->getStats().setMaxMana(data);
-			
-			notifySetMana(peerInfo(m_CurrPeer)->getChampion());
-			return true;
-        }
+        
         */
 		
         //Model
@@ -528,7 +559,7 @@ bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
 			SendServerMessage(".model [name] - replaces current model with new one");
 			SendServerMessage(".help - opens this help message");
 			SendServerMessage(".spawn - spawns 3 minions per side");
-
+			SendServerMessage(".cooldown [spellNo] [value] - Set cooldown of a specific (SpellNo) spell");
 			return true;
 		}
     }

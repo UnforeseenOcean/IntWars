@@ -31,6 +31,8 @@ public:
 
 	static void Init(PacketHandler* packetHandler);
 	static void AddPlayer(ClientInfo* player);
+	static void RemovePlayer(ClientInfo* player);
+
 	static const std::vector<ClientInfo*>& GetPlayerList();
 	static ClientInfo* FindPlayer(uint32 netId);
 	static Map* GetMap();

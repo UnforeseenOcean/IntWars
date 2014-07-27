@@ -117,7 +117,7 @@ struct ClientReady {
 	uint32 teamId;
 };
 
-typedef struct _SynchVersionAns {
+/*typedef struct _SynchVersionAns {
 	_SynchVersionAns() {
 		header.cmd = PKT_S2C_SynchVersion;
 		ok = ok2 = 1;
@@ -139,7 +139,68 @@ typedef struct _SynchVersionAns {
 	uint8 zero[2232];
 	uint16 end1;            //0xE2E0
 	uint8 end2;             //0xA0 || 0x08
-} SynchVersionAns;
+} SynchVersionAns;*/
+
+class SynchVersionAns : public BasePacket {
+public:
+
+   SynchVersionAns(const std::vector<ClientInfo*>& players, const std::string& version, const std::string& gameMode) : BasePacket(PKT_S2C_SynchVersion) {
+      buffer << (uint8)9; // unk
+      buffer << (uint32)1; // mapId
+      for(auto p : players) {
+         buffer << p->userId;
+         buffer << (uint16)0x1E; // unk
+         buffer << p->summonerSkills[0];
+         buffer << p->summonerSkills[1];
+         buffer << (uint8)0; // bot boolean
+         buffer << p->getTeam();
+         buffer << p->getName();
+         buffer.fill(0, 64-p->getName().length());
+         buffer.fill(0, 64);
+         buffer << p->getRank();
+         buffer.fill(0, 30-p->getRank().length());
+      }
+      
+      for(int i = 0; i < 12-players.size(); ++i) {
+         buffer << (int64)-1;
+         buffer.fill(0, 173);
+      }
+            
+        buffer << version;
+        buffer.fill(0, 256-version.length());
+        buffer << gameMode;
+        buffer.fill(0, 128-gameMode.length());
+        
+        buffer.fill(0, 2574);
+    }
+
+   /* PacketHeader header;
+    uint8 ok;
+    uint32 mapId;
+    SynchBlock players[12];
+    uint8 version[256]; 
+    uint8 gameMode[128];
+    uint8 unk1[512];
+    uint8 unk2[245];
+
+    uint8 ekg1[256]; //ekg.riotgames.net
+    uint8 msg1[256]; //"/messages"
+
+    uint16 wUnk1; //0x50?
+    uint8 ekg2[256]; //ekg.riotgames.net
+    uint8 msg2[256]; //"/messages"
+
+    uint16 wUnk2; //0x50?
+    uint8 ekg3[256]; //ekg.riotgames.net
+    uint8 msg3[256]; //"/messages"
+
+    uint16 wUnk3; //0x50?
+    uint32 dwUnk1;
+    uint32 dwOpt; //0x377192
+    uint8 bUnk1[0x100];
+    uint8 bUnk2[11];*/
+};
+
 
 typedef struct _PingLoadInfo {
 	PacketHeader header;
@@ -244,8 +305,8 @@ class SetHealth : public BasePacket {
 public:	
 	SetHealth(Unit* u) : BasePacket(PKT_S2C_SetHealth, u->getNetId()) {
 		buffer << (uint16)0x0000; // unk
-		buffer << u->getStats().getCurrentHealth();
-		buffer << u->getStats().getMaxHealth();
+		buffer << u->getStats()->getCurrentHealth();
+		buffer << u->getStats()->getMaxHealth();
 	}
 };
 
@@ -615,7 +676,7 @@ struct CharacterStats {
 class UpdateStats : public GamePacket {
 public:
 	UpdateStats(Unit* u) : GamePacket(PKT_S2C_CharStats, u->getNetId()) {
-		const std::multimap<uint8, uint32>& stats = u->getStats().getUpdatedStats();
+		const std::multimap<uint8, uint32>& stats = u->getStats()->getUpdatedStats();
 
 		std::set<uint8> masks;
 		uint8 masterMask = 0;
@@ -642,7 +703,7 @@ public:
 			for(int i = 0; i < 32; ++i) {
 				uint32 tmpMask = (1 << i);
 				if(tmpMask & mask) {
-					buffer << u->getStats().getStat(m, tmpMask);
+					buffer << u->getStats()->getStat(m, tmpMask);
 				}
 			}
 		}

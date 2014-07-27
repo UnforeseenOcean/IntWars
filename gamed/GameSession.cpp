@@ -36,11 +36,6 @@ GameSession::~GameSession()
 	delete m_Map;
 	m_Map = 0;
 
-	for(int i=0; i < m_Players.size();i++)
-	{
-		delete m_Players[i];
-		m_Players[i] = 0;
-	}
 	m_Players.clear();
 }
 
@@ -52,6 +47,18 @@ void GameSession::AddPlayer(ClientInfo* player)
 	}
 	m_Players.push_back(player);
 	m_Map->addObject(player->getChampion());
+}
+
+void GameSession::RemovePlayer(ClientInfo* player)
+{	
+	player->getChampion()->setToRemove();
+	m_Players.erase(std::find(std::begin(m_Players), std::end(m_Players), player));
+	
+
+	if(m_Players.size() == 0)
+	{
+		m_Map->RemoveAllObjects();
+	}
 }
 
 const std::vector<ClientInfo*>& GameSession::GetPlayerList()
