@@ -357,6 +357,9 @@ bool PacketHandler::handleQueryStatus(HANDLE_ARGS) {
 }
 
 bool PacketHandler::handleChatBoxMessage(HANDLE_ARGS) {
+	Announce announcementWelcomeToSummonersRift(59, 1);
+    sendPacket(reinterpret_cast<uint8 *>(&announcementWelcomeToSummonersRift), sizeof(Announce), CHL_S2C); // this should work :(
+	
     ChatMessage *message = reinterpret_cast<ChatMessage *>(packet->data);
     //Lets do commands
     if(message->msg == '.') {

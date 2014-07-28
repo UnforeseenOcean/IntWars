@@ -479,7 +479,7 @@ public:
 		buffer << (uint64)0x00000000d5002fce; // unk
 		buffer << (uint32)0x7f7fffff; // unk
 		buffer << (uint8)0 << (uint8)0x66 << (uint8)0;
-		buffer << (uint32)0x0a0fe625; // Projectile unique ID ; Right now hardcoded at Mystic Shot
+		buffer << (uint32)0x0BF847F5; // Projectile unique ID ; Right now hardcoded (Mystic Shot: orginal 0x0a0fe625 but works with 0x05FE9CE5 too) Well and this is more sandbox fun: 0BF847F5
 		buffer << (uint32)0x400001f8; // Projectile NetID + 1 ?
 		buffer << (uint8)0; // unk
 		buffer << (uint32)0x3f800000; // unk (1.0f)
@@ -930,7 +930,16 @@ class LevelPropSpawn : public BasePacket {
         uint8 type[64];*/
 };
 
-struct Announce {
+struct Announce { // there is still something wrong, need to reverse engineer it
+	Announce(uint8 _msg, uint32 _mapNo) { 
+		memset(this, 0, sizeof(Announce));
+		header.cmd = PacketCmd(PKT_S2C_Announce);
+		header.netId = 0; // maybe not 0
+
+		msg = _msg;
+		unknown = 0;		
+		mapNo = _mapNo;
+	}
 	PacketHeader header;
 	uint8 msg;
 	uint64 unknown;
