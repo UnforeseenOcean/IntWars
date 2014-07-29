@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "SummonersRift.h"
 #include "Turret.h"
 #include "Game.h"
@@ -5,8 +6,11 @@
 
 using namespace std;
 
-SummonersRift::SummonersRift(Game* game) : Map(game) {
-   vector<string> szTurrets = {
+SummonersRift::SummonersRift(Game* game) : Map(game) 
+{
+	//inline initializing is not supported by vs. So we need a workaround :(
+
+	static const string arr[] = {
       "@Turret_T1_R_03_A",
       "@Turret_T1_R_02_A",
       "@Turret_T1_C_07_A",
@@ -33,7 +37,10 @@ SummonersRift::SummonersRift(Game* game) : Map(game) {
       "@Turret_T2_L_01_A"
    };
     
-   for(string& s : szTurrets) {
+	vector<string> szTurrets(arr, arr + sizeof(arr) / sizeof(arr[0]));
+
+   for(string& s : szTurrets) 
+   {
       addObject(new Turret(this, GetNewNetID(), s, 0, 0));
    }
    

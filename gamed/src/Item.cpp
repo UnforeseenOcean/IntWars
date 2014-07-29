@@ -1,7 +1,8 @@
-
+#include "stdafx.h"
 #include "Item.h"
 
-Item::Item() {
+Item::Item() 
+{
     id = -1;
     stackAmount = 1;
     active = false;

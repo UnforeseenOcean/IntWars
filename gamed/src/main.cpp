@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "stdafx.h"
 #include "Game.h"
-#include "GameSession.h"
 
 #define SERVER_HOST ENET_HOST_ANY 
 #define SERVER_PORT 5119
@@ -35,9 +34,14 @@ int main(int argc, char ** argv)
 	address.host = SERVER_HOST;
 	address.port = SERVER_PORT;
 	
-	g.initialize(&address, SERVER_KEY);
-	Logging->writeLine("Initializing GameSession\n");
-	GameSession::Init(server->GetPacketHandler());
+
+	Logging->writeLine("Initializing Game Session\n");
+	if(!g.initialize(&address, SERVER_KEY))
+	{
+		Logging->writeLine("Failed to initialize game!");
+		return -1;
+	}
+
 	g.netLoop();
 
 

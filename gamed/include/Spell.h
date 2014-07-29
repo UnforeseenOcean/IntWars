@@ -79,6 +79,14 @@ public:
       }
       return cooldown[level-1];
    }
+
+   void setCooldown(int level, int value)
+   {
+	   if(level>=5|| level < 0)
+		   return;
+
+	   cooldown[level-1] = value;
+   }
    
    /**
     * @return the mana/energy/health cost

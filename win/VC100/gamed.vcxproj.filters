@@ -1,18 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
-    </Filter>
     <Filter Include="Protocol">
       <UniqueIdentifier>{eeac7bfa-3b4f-4c49-987a-ab1bfa6da602}</UniqueIdentifier>
     </Filter>
@@ -25,124 +13,155 @@
     <Filter Include="logic\Characters">
       <UniqueIdentifier>{77ab80e7-98eb-4377-913d-fa74845afb70}</UniqueIdentifier>
     </Filter>
+    <Filter Include="logic\Maps">
+      <UniqueIdentifier>{0c2b7dba-cf88-45df-aba6-566f2d3dd898}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{48aff62c-a0f5-4fac-9c1b-bfaf52ac6e24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="logic\Characters\Champions">
+      <UniqueIdentifier>{0bddbd72-d721-4f9d-9178-2b463c452291}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="logic\Characters\Champions\Ezreal">
+      <UniqueIdentifier>{760326d6-8ed6-4575-a67d-49986eabf26a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\gamed\Log.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\Handlers.cpp">
-      <Filter>Protocol</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\PacketHandler.cpp">
-      <Filter>Protocol</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\Packets.cpp">
-      <Filter>Protocol</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\main.cpp" />
-    <ClCompile Include="..\..\gamed\GameSession.cpp">
-      <Filter>logic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\Map.cpp">
-      <Filter>logic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\Client.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\Object.cpp">
-      <Filter>logic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\Server.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\Unit.cpp">
-      <Filter>logic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\Stats.cpp">
-      <Filter>logic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\Notifiers.cpp">
-      <Filter>Protocol</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\Spell.cpp">
-      <Filter>logic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\Champion.cpp">
+    <ClInclude Include="..\..\gamed\include\AI\MinionAI.h">
+      <Filter>logic\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\AI\AI.h">
+      <Filter>logic\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Champion.h">
       <Filter>logic\Characters</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\Minion.cpp">
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\ChampionFactory.h">
       <Filter>logic\Characters</Filter>
-    </ClCompile>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Minion.h">
+      <Filter>logic\Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\MinionStats.h">
+      <Filter>logic\Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\ChatBox.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\common.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Game.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Inventory.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Item.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\ItemFactory.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\LevelProp.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Object.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Projectile.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Spell.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Stats.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Target.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Turret.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Unit.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Buffer.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Packets.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Map.h">
+      <Filter>logic\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\SummonersRift.h">
+      <Filter>logic\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Client.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\stdafx.h" />
+    <ClInclude Include="..\..\gamed\include\Log.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\Log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\PacketHandler.h">
-      <Filter>Protocol</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\Packets.h">
-      <Filter>Protocol</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\ChatBox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\Client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\Map.h">
+    <ClCompile Include="..\..\gamed\src\main.cpp" />
+    <ClCompile Include="..\..\gamed\src\Log.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Game.cpp">
       <Filter>logic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\GameSession.h">
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Object.cpp">
       <Filter>logic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\Buffer.h">
-      <Filter>Protocol</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\Unit.h">
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Spell.cpp">
       <Filter>logic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\Object.h">
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Unit.cpp">
       <Filter>logic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\Stats.h">
-      <Filter>logic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\Spell.h">
-      <Filter>logic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\Projectile.h">
-      <Filter>logic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\AI\MinionAI.h">
-      <Filter>logic\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\AI\AI.h">
-      <Filter>logic\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\Server.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\ChampionFactory.h">
-      <Filter>logic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\Champion.h">
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Champion.cpp">
       <Filter>logic\Characters</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\Minion.h">
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Map.cpp">
+      <Filter>logic\Maps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Inventory.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Stats.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\MysticShot.cpp">
+      <Filter>logic\Characters\Champions\Ezreal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\ArcaneShift.cpp">
+      <Filter>logic\Characters\Champions\Ezreal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\PacketHandler.cpp">
+      <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Handlers.cpp">
+      <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\SummonersRift.cpp">
+      <Filter>logic\Maps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Item.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Minion.cpp">
       <Filter>logic\Characters</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\MinionStats.h">
-      <Filter>logic\Characters</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\win\platforms-time.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Notifiers.cpp">
+      <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Projectile.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

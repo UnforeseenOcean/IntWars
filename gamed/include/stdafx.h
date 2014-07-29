@@ -23,6 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <thread>
+#include <chrono>
+#include <sstream>
 
 #include <glm/glm.hpp>
 
@@ -37,5 +40,9 @@ typedef unsigned long long uint64;
 
 
 #define PKT_MAX = 0x100
+
+#define Logging Log::getMainInstance()
+
+#define sleep(x) this_thread::sleep_for(chrono::microseconds(x*1000));
 
 #endif

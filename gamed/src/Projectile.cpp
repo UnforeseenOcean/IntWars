@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <map>
 
 #include "Map.h"

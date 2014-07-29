@@ -1,26 +1,22 @@
 #ifndef TARGET_H_
 #define TARGET_H_
 
-class Target {
+#include <glm/glm.hpp>
+
+class Target : public glm::vec2
+{
 
 public:
    
    virtual ~Target() { }
-   Target(float x, float y) : x(x), y(y) { }
-
-   float distanceWith(Target* target);
-   float distanceWith(float xtarget, float ytarget);
-
-   float getX() const { return x; }
-   float getY() const { return y; }
-
-   void setPosition(float x, float y) { this->x = x; this->y = y; }
-
+   Target(float x, float y) : glm::vec2(x,y) { }
+   
    virtual bool isSimpleTarget() { return true; }
 
-protected:
-	
-   float x, y;
+   float distance(glm::vec2 t)
+   {
+	   return glm::distance((glm::vec2)*this,t);
+   }
 };
 
 #endif

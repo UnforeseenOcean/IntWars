@@ -1,10 +1,13 @@
 #ifndef _MAP_H
 #define _MAP_H
 
+#include "stdafx.h"
 #include <map>
 #include <vector>
 
-#include "stdafx.h"
+#include <enet/enet.h>
+
+
 #include "Object.h"
 
 class Game;
@@ -21,6 +24,8 @@ public:
    virtual ~Map() { }
    virtual void update(long long diff);
    
+   bool Init(ENetPeer *peer);
+
    Object* getObjectById(uint32 id);
    void addObject(Object* o);
    

@@ -15,6 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include "stdafx.h"
 #include "Game.h"
 #include "Packets.h"
 #undef min
@@ -57,7 +58,7 @@ void Game::printPacket(const uint8 *buffer, uint32 size)
 {
 
    unsigned int i;
-   printf("Printing with size %u\n", size);
+   Logging->write("Printing with size %u\n", size);
    
    for(i = 0; i < size; ++i) {
       if(i != 0&& i%16 == 0) {
@@ -159,17 +160,53 @@ bool Game::handlePacket(ENetPeer *peer, ENetPacket *packet, uint8 channelID)
 	}
 
 	PacketHeader *header = reinterpret_cast<PacketHeader*>(packet->data);	
-   printf("Handling OpCode %02X\n", header->cmd);
+	Logging->writeLine("Handling OpCode %02X\n", header->cmd);
 	bool (Game::*handler)(HANDLE_ARGS) = _handlerTable[header->cmd][channelID];
 	
 	if(handler)
 	{
-		return (*this.*handler)(peer,packet);
+		if(!(*this.*handler)(peer,packet))
+		{
+			Logging->error("Packet handling failed!");
+		}
 	}
 	else
 	{
-		//PDEBUG_LOG_LINE(Logging,"Unknown packet: CMD %X(%i) CHANNEL %X(%i)\n", header->cmd, header->cmd,channelID,channelID);
+		PDEBUG_LOG_LINE(Logging,"Unknown packet: CMD %X(%i) CHANNEL %X(%i)\n", header->cmd, header->cmd,channelID,channelID);
 		printPacket(packet->data, packet->dataLength);
 	}
-	return false;	
+	return true;
+}
+
+void Game::broadcastServerMessage(std::string msg)
+{
+	//This is kind of an very ugly hack! Could cause memory leaks :/
+	SystemChatMessage packet;
+	packet.cmd = PKT_ChatBoxMessage;
+	packet.lenght = msg.length();
+
+	strcpy(packet.msg,msg.c_str());
+
+	packet.netId = 0;
+	packet.playerNo = 0;
+	packet.type = CHAT_ALL;
+
+	broadcastPacket(reinterpret_cast<uint8*>(&packet), sizeof(packet), CHL_COMMUNICATION);
+}
+
+void Game::SendServerMessage(ENetPeer *peer, std::string msg)
+{
+	//This is kind of an very ugly hack! Could cause memory leaks :/
+	SystemChatMessage packet;
+	packet.cmd = PKT_ChatBoxMessage;
+	packet.lenght = msg.length();
+
+	strcpy(packet.msg,msg.c_str());
+
+	packet.netId = 0;
+	packet.playerNo = 0;
+	packet.type = CHAT_TEAM;
+
+	sendPacket(peer, reinterpret_cast<uint8*>(&packet), sizeof(packet), CHL_COMMUNICATION);
+
 }

@@ -1,0 +1,16 @@
+*.com
+*.class
+*.o
+*.obj
+*.so
+*.pdb
+*.lib
+*.exp
+*.o.*
+*.a
+*.so.dbg
+*.bin
+*.ilk
+*.aps
+*.exe
+RAFCache.dat

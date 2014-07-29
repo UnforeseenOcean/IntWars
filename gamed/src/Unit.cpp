@@ -1,5 +1,6 @@
+#include "stdafx.h"
 #include "Unit.h"
-#include "AI.h"
+#include "AI/AI.h"
 #include "Map.h"
 #include "Game.h"
 
@@ -15,7 +16,7 @@ Unit::~Unit() {
 }
 
 void Unit::update(int64 diff) {
-   if(unitTarget && distanceWith(unitTarget) <= stats->getRange()) {
+   if(unitTarget && distance(*unitTarget) <= stats->getRange()) {
       if(autoAttackCooldown <= 0) {
          map->getGame()->notifyAutoAttack(this, unitTarget);
          Projectile* p = new Projectile(map, GetNewNetID(), x, y, 10, 10, this, unitTarget, 0, getAttackProjectileSpeed());

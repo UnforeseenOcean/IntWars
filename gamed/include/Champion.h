@@ -28,7 +28,8 @@ public:
    
    Spell* castSpell(uint8 slot, float x, float y, Unit* target);
    Spell* levelUpSpell(uint8 slot);
-   
+   Spell* GetSpell(int index);
+
    virtual void update(int64 diff);
    
    Inventory inventory;

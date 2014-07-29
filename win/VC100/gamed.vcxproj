@@ -50,10 +50,10 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)..\dep\include\glm;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\dep\include\glm;$(SolutionDir)..\gamed\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)..\dep\include\glm;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\dep\include\glm;$(SolutionDir)..\gamed\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -85,47 +85,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\gamed\Champion.cpp" />
-    <ClCompile Include="..\..\gamed\Client.cpp" />
-    <ClCompile Include="..\..\gamed\GameSession.cpp" />
-    <ClCompile Include="..\..\gamed\Log.cpp" />
-    <ClCompile Include="..\..\gamed\Map.cpp" />
-    <ClCompile Include="..\..\gamed\Minion.cpp" />
-    <ClCompile Include="..\..\gamed\Notifiers.cpp" />
-    <ClCompile Include="..\..\gamed\Server.cpp" />
-    <ClCompile Include="..\..\gamed\Handlers.cpp" />
-    <ClCompile Include="..\..\gamed\Object.cpp" />
-    <ClCompile Include="..\..\gamed\PacketHandler.cpp" />
-    <ClCompile Include="..\..\gamed\Packets.cpp" />
-    <ClCompile Include="..\..\gamed\main.cpp" />
-    <ClCompile Include="..\..\gamed\Spell.cpp" />
-    <ClCompile Include="..\..\gamed\Stats.cpp" />
-    <ClCompile Include="..\..\gamed\Unit.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\gamed\AI\AI.h" />
-    <ClInclude Include="..\..\gamed\AI\MinionAI.h" />
-    <ClInclude Include="..\..\gamed\Buffer.h" />
-    <ClInclude Include="..\..\gamed\Champion.h" />
-    <ClInclude Include="..\..\gamed\ChampionFactory.h" />
-    <ClInclude Include="..\..\gamed\ChatBox.h" />
-    <ClInclude Include="..\..\gamed\Client.h" />
-    <ClInclude Include="..\..\gamed\GameSession.h" />
-    <ClInclude Include="..\..\gamed\Map.h" />
-    <ClInclude Include="..\..\gamed\Minion.h" />
-    <ClInclude Include="..\..\gamed\MinionStats.h" />
-    <ClInclude Include="..\..\gamed\Server.h" />
-    <ClInclude Include="..\..\common.h" />
-    <ClInclude Include="..\..\gamed\Log.h" />
-    <ClInclude Include="..\..\gamed\Object.h" />
-    <ClInclude Include="..\..\gamed\PacketHandler.h" />
-    <ClInclude Include="..\..\gamed\Packets.h" />
-    <ClInclude Include="..\..\gamed\Projectile.h" />
-    <ClInclude Include="..\..\gamed\Spell.h" />
-    <ClInclude Include="..\..\gamed\Stats.h" />
-    <ClInclude Include="..\..\gamed\Unit.h" />
-    <ClInclude Include="..\..\gamed\win\platforms-time.h" />
-    <ClInclude Include="..\..\stdafx.h" />
+    <ClInclude Include="..\..\gamed\include\AI\AI.h" />
+    <ClInclude Include="..\..\gamed\include\AI\MinionAI.h" />
+    <ClInclude Include="..\..\gamed\include\Buffer.h" />
+    <ClInclude Include="..\..\gamed\include\Champion.h" />
+    <ClInclude Include="..\..\gamed\include\ChampionFactory.h" />
+    <ClInclude Include="..\..\gamed\include\ChatBox.h" />
+    <ClInclude Include="..\..\gamed\include\Client.h" />
+    <ClInclude Include="..\..\gamed\include\common.h" />
+    <ClInclude Include="..\..\gamed\include\Game.h" />
+    <ClInclude Include="..\..\gamed\include\Inventory.h" />
+    <ClInclude Include="..\..\gamed\include\Item.h" />
+    <ClInclude Include="..\..\gamed\include\ItemFactory.h" />
+    <ClInclude Include="..\..\gamed\include\LevelProp.h" />
+    <ClInclude Include="..\..\gamed\include\Log.h" />
+    <ClInclude Include="..\..\gamed\include\Map.h" />
+    <ClInclude Include="..\..\gamed\include\Minion.h" />
+    <ClInclude Include="..\..\gamed\include\MinionStats.h" />
+    <ClInclude Include="..\..\gamed\include\Object.h" />
+    <ClInclude Include="..\..\gamed\include\Packets.h" />
+    <ClInclude Include="..\..\gamed\include\Projectile.h" />
+    <ClInclude Include="..\..\gamed\include\Spell.h" />
+    <ClInclude Include="..\..\gamed\include\Stats.h" />
+    <ClInclude Include="..\..\gamed\include\stdafx.h" />
+    <ClInclude Include="..\..\gamed\include\SummonersRift.h" />
+    <ClInclude Include="..\..\gamed\include\Target.h" />
+    <ClInclude Include="..\..\gamed\include\Turret.h" />
+    <ClInclude Include="..\..\gamed\include\Unit.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="enet-1.2.5.vcxproj">
@@ -136,6 +122,27 @@
       <Project>{253d40b4-8b15-44d1-a718-c4035a31e5de}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\gamed\src\ArcaneShift.cpp" />
+    <ClCompile Include="..\..\gamed\src\Champion.cpp" />
+    <ClCompile Include="..\..\gamed\src\Game.cpp" />
+    <ClCompile Include="..\..\gamed\src\Handlers.cpp" />
+    <ClCompile Include="..\..\gamed\src\Inventory.cpp" />
+    <ClCompile Include="..\..\gamed\src\Item.cpp" />
+    <ClCompile Include="..\..\gamed\src\Log.cpp" />
+    <ClCompile Include="..\..\gamed\src\main.cpp" />
+    <ClCompile Include="..\..\gamed\src\Map.cpp" />
+    <ClCompile Include="..\..\gamed\src\Minion.cpp" />
+    <ClCompile Include="..\..\gamed\src\MysticShot.cpp" />
+    <ClCompile Include="..\..\gamed\src\Notifiers.cpp" />
+    <ClCompile Include="..\..\gamed\src\Object.cpp" />
+    <ClCompile Include="..\..\gamed\src\PacketHandler.cpp" />
+    <ClCompile Include="..\..\gamed\src\Projectile.cpp" />
+    <ClCompile Include="..\..\gamed\src\Spell.cpp" />
+    <ClCompile Include="..\..\gamed\src\Stats.cpp" />
+    <ClCompile Include="..\..\gamed\src\SummonersRift.cpp" />
+    <ClCompile Include="..\..\gamed\src\Unit.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

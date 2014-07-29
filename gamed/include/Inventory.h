@@ -5,7 +5,7 @@
 
 #define MAX_STACK_AMOUNT 5
 
-
+#include "stdafx.h"
 #include "Item.h"
 
 #include "Items/NoItem.h"

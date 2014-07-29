@@ -425,6 +425,20 @@ struct ChatMessage {
     }
 };
 
+struct SystemChatMessage {
+	uint8 cmd;
+	uint32 netId;
+	uint32 unk1;
+	uint8 unk2;
+
+	ChatType type;
+	uint32 playerNo;    
+	uint32 lenght;
+	uint8 unk3[32];
+	int8 msg[255];
+
+};
+
 typedef struct _UpdateModel {
     _UpdateModel(uint32 netID, const char *szModel) {
         memset(this, 0, sizeof(_UpdateModel));
@@ -517,8 +531,8 @@ struct HeroSpawn2 : public BasePacket {
         buffer.fill(0, 13);
         buffer << (uint8)3; // unk
         buffer << (uint32)1; // unk
-        buffer << p->getX();
-        buffer << p->getY();
+        buffer << p->x;
+        buffer << p->y;
         buffer << (float)0x3F441B7D; // z ?
         buffer << (float)0x3F248DBB; // Rotation ?
     }
@@ -722,7 +736,7 @@ public:
       buffer << attacked->getNetId();
       buffer << (uint16)0xd580; // unk
       buffer << 12.f; // unk
-      buffer << attacker->getX() << attacker->getY();
+      buffer << attacker->x << attacker->y;
    }
 };
 
@@ -809,7 +823,7 @@ public:
       buffer << s->getSlot(); 
       buffer << (uint16)0; // unk
       buffer << (uint16)0x41e0; // unk
-      buffer << s->getOwner()->getX() << 55.f << s->getOwner()->getY();
+      buffer << s->getOwner()->x << 55.f << s->getOwner()->y;
       buffer << (uint64)1; // unk
 }
 };
@@ -835,14 +849,14 @@ public:
 class SpawnProjectile : public BasePacket {
 public:
    SpawnProjectile(Projectile* p) : BasePacket(PKT_S2C_SpawnProjectile, p->getNetId()) {
-      buffer << p->getX() << 150.f << p->getY();
-      buffer << p->getX() << 150.f << p->getY();
+      buffer << p->x << 150.f << p->y;
+      buffer << p->x << 150.f << p->y;
       buffer << (uint64)0x000000003f510fe2; // unk
       buffer << (float)0.577f; // unk
-      buffer << p->getTarget()->getX() << 150.f << p->getTarget()->getY();
-      buffer << p->getX() << 150.f << p->getY();
-      buffer << p->getTarget()->getX() << 150.f << p->getTarget()->getY();
-      buffer << p->getX() << 150.f << p->getY();
+      buffer << p->getTarget()->x << 150.f << p->getTarget()->y;
+      buffer << p->x << 150.f << p->y;
+      buffer << p->getTarget()->x << 150.f << p->getTarget()->y;
+      buffer << p->x << 150.f << p->y;
       buffer << uint32(0); // unk
       buffer << 2000.f; // Projectile speed
       buffer << (uint64)0x00000000d5002fce; // unk
@@ -855,8 +869,8 @@ public:
       buffer << p->getOwner()->getNetId() << p->getOwner()->getNetId();
       buffer << (uint32)0x9c0cb5a7; // unk
       buffer << p->getNetId();
-      buffer << p->getTarget()->getX() << 150.f << p->getTarget()->getY();
-      buffer << p->getTarget()->getX() << 150.f << p->getTarget()->getY();
+      buffer << p->getTarget()->x << 150.f << p->getTarget()->y;
+      buffer << p->getTarget()->x << 150.f << p->getTarget()->y;
       buffer << (uint32)0x80000000; // unk
       buffer << (uint32)0x000000bf; // unk
       buffer << (uint32)0x80000000; // unk
@@ -865,7 +879,7 @@ public:
       buffer << (uint16)0x0000; // unk
       buffer << (uint8)0x2f; // unk
       buffer << (uint32)0x00000000; // unk
-      buffer << p->getX() << 150.f << p->getY();
+      buffer << p->x << 150.f << p->y;
       buffer << (uint64)0x0000000000000000; // unk
    }
 
@@ -914,7 +928,7 @@ class LevelPropSpawn : public BasePacket {
             buffer << lp->getNetId();
             buffer << (uint32)0x00000040; // unk
             buffer << (uint8)0; // unk
-            buffer << lp->getX() << lp->getZ() << lp->getY();
+            buffer << lp->x << lp->getZ() << lp->y;
             buffer.fill(0, 41); // unk
             buffer << lp->getName();
             buffer.fill(0, 64-lp->getName().length());

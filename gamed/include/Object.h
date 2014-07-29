@@ -6,10 +6,10 @@
 #ifndef OBJECT_H_
 #define OBJECT_H_
 
+#include "stdafx.h"
 #include <vector>
 
 #include "Target.h"
-#include "stdafx.h"
 
 class Map;
 

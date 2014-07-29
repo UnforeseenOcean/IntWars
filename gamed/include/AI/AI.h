@@ -1,7 +1,7 @@
 #ifndef _AI_H
 #define _AI_H
 
-#include "Unit.h"
+#include "../Unit.h"
 
 class AI {
 

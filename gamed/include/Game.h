@@ -18,13 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _NETWORK_LISTENER_H
 #define _NETWORK_LISTENER_H
 
-#include "Log.h"
-
+#include "stdafx.h"
 
 #include <enet/enet.h>
 #include <intlib/base64.h>
 #include <intlib/blowfish.h>
 
+#include "Log.h"
 #include "Map.h"
 #include "common.h"
 #include "Client.h"
@@ -39,6 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class Game
 {
+	friend class Map;
+
 	public:
 		Game();
 		~Game();
@@ -67,42 +69,38 @@ class Game
 		bool handleSkillUp(HANDLE_ARGS);
 		bool handleEmotion(HANDLE_ARGS);
 		bool handleBuyItem(HANDLE_ARGS);
-      bool handleCastSpell(HANDLE_ARGS);
-      bool handleClick(HANDLE_ARGS);
-      bool handleExit(HANDLE_ARGS);
-      // Notifiers
-      void notifyMinionSpawned(Minion* m);
-      void notifySetHealth(Unit* u);
-      void notifyUpdatedStats(Unit* u);
-      void notifyMovement(Object* o);
-      void notifyDamageDone(Unit* source, Unit* target, float amount);
-      void notifyAutoAttack(Unit* attacker, Unit* victim);
-      void notifyTeleport(Unit* u);
-      void notifyProjectileSpawn(Projectile* p);
-   
+		bool handleCastSpell(HANDLE_ARGS);
+		bool handleClick(HANDLE_ARGS);
+		bool handleExit(HANDLE_ARGS);
+      
+		// Notifiers
+		void notifyMinionSpawned(Minion* m);
+		void notifySetHealth(Unit* u);
+		void notifyUpdatedStats(Unit* u);
+		void notifyMovement(Object* o);
+		void notifyDamageDone(Unit* source, Unit* target, float amount);
+		void notifyAutoAttack(Unit* attacker, Unit* victim);
+		void notifyTeleport(Unit* u);
+		void notifyProjectileSpawn(Projectile* p);
    protected:
 		// Tools
 		void printPacket(const uint8 *buf, uint32 len);
 		void printLine(uint8 *buf, uint32 len);
 		bool sendPacket(ENetPeer *peer, const uint8 *data, uint32 length, uint8 channelNo, uint32 flag = RELIABLE);
-      bool sendPacket(ENetPeer *peer, const Packet& packet, uint8 channelNo, uint32 flag = RELIABLE);
+		bool sendPacket(ENetPeer *peer, const Packet& packet, uint8 channelNo, uint32 flag = RELIABLE);
 		bool broadcastPacket(uint8 *data, uint32 length, uint8 channelNo, uint32 flag = RELIABLE);
-      bool broadcastPacket(const Packet& packet, uint8 channelNo, uint32 flag = RELIABLE);
-
-		void notifyMinionSpawned(Minion* m);
-		void notifySetHealth(Unit* u);
-		void notifyUpdatedStats(Unit* u);
-		void notifyMovement(Object* o);
+		bool broadcastPacket(const Packet& packet, uint8 channelNo, uint32 flag = RELIABLE);
+	 
+		
 
 		void broadcastServerMessage(std::string msg);
-		void SendServerMessage(std::string msg);
+		void SendServerMessage(ENetPeer *peer, std::string msg);
 
 	private:
 		bool _isAlive, _started;
 		ENetHost *_server;
 		BlowFish *_blowfish;
-      ENetPeer* currentPeer;
-		ENetPeer *m_CurrPeer;
+		ENetPeer* currentPeer;
       std::vector<ClientInfo*> players;
       
       void registerHandler(bool (Game::*handler)(HANDLE_ARGS), PacketCmd pktcmd,Channel c);

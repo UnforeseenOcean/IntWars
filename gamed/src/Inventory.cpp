@@ -1,6 +1,6 @@
-
-#include "Inventory.h"
 #include "stdafx.h"
+#include "Inventory.h"
+
 
 Inventory::Inventory() {
     

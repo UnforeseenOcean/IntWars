@@ -1,6 +1,7 @@
 #ifndef _LEVELPROP_H
 #define _LEVELPROP_H
 
+#include "stdafx.h"
 #include "Object.h"
 
 class LevelProp : public Object {

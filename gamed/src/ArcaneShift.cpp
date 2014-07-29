@@ -1,40 +1,42 @@
+#include "stdafx.h"
 #include "Champions/Ezreal/ArcaneShift.h"
 #include "Game.h"
 #include "Map.h"
-#include "Vector2.h"
-void ArcaneShift::finishCasting() {
+
+void ArcaneShift::finishCasting() 
+{
    Spell::finishCasting();
 
    printf("Teleporting to X:%f , Y:%f", x, y);
 
-   Vector2 trueCoords;
+   glm::vec2 trueCoords;
    
-   Vector2 cur(owner->getX(), owner->getY());
+   glm::vec2 cur(owner->x, owner->y);
    
-   Vector2 to(x, y);
+   glm::vec2 to(x, y);
    
-   Vector2 sub = to - cur;
+   glm::vec2 sub = to - cur;
    
-   if(sub.Length() > 475){ 
+   if(glm::length(sub) > 475){ 
    
-   sub = sub.Normalize(); 
+   sub = glm::normalize(sub); 
    
-   trueCoords = cur + (sub * 475); 
+   trueCoords = cur + (sub * glm::vec2(475)); 
    }else{ 
-       trueCoords = Vector2(x, y);
+       trueCoords = glm::vec2(x, y);
    }
 
    owner->needsToTeleport = true;
-   owner->teleportToX = (trueCoords.X-MAP_WIDTH) / 2; 
-   owner->teleportToY = (trueCoords.Y-MAP_HEIGHT)/2;
+   owner->teleportToX = (trueCoords.x-MAP_WIDTH) / 2; 
+   owner->teleportToY = (trueCoords.y-MAP_HEIGHT)/2;
    
    
-   owner->setPosition(trueCoords.X, trueCoords.Y);
-   
-   
+   owner->setPosition(trueCoords.x, trueCoords.y);
+      
 }
 
-void ArcaneShift::applyEffects(Target* t, Projectile* p) {
+void ArcaneShift::applyEffects(Target* t, Projectile* p) 
+{
     
     
 }

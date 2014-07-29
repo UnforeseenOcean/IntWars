@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <vector>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -45,12 +46,14 @@ bool Game::handleKeyCheck(ENetPeer *peer, ENetPacket *packet) {
          KeyCheck response;
          response.userId = keyCheck->userId;
          bool bRet = sendPacket(peer, reinterpret_cast<uint8 *>(&response), sizeof(KeyCheck), CHL_HANDSHAKE);
-         handleGameNumber(peer, NULL);//Send 0x91 Packet?
-         return true;
+		 if(!bRet)
+			 return false;
+         bRet = handleGameNumber(peer, NULL);//Send 0x91 Packet?
+         return bRet;
       }
    }
 
-   return false;
+   return true;
 
 }
 
@@ -71,7 +74,7 @@ bool Game::handleSynch(ENetPeer *peer, ENetPacket *packet) {
 }
 
 bool Game::handleMap(ENetPeer *peer, ENetPacket *packet) {
-    LoadScreenPlayerName loadName(*peerInfo(peer));
+    /*LoadScreenPlayerName loadName(*peerInfo(peer));
     LoadScreenPlayerChampion loadChampion(*peerInfo(peer));
     //Builds team info
     LoadScreenInfo screenInfo;
@@ -83,14 +86,16 @@ bool Game::handleMap(ENetPeer *peer, ENetPacket *packet) {
     bool pName = sendPacket(peer, loadName, CHL_LOADING_SCREEN);
     bool pHero = sendPacket(peer, loadChampion, CHL_LOADING_SCREEN);
 
-    return (pInfo && pName && pHero);
+    return (pInfo && pName && pHero);*/
+
+	return map->Init(peer);
 }
 
 //building the map
 bool Game::handleSpawn(ENetPeer *peer, ENetPacket *packet) {
    StatePacket2 start(PKT_S2C_StartSpawn);
    bool p1 = sendPacket(peer, reinterpret_cast<uint8 *>(&start), sizeof(StatePacket2), CHL_S2C);
-   printf("Spawning map\r\n");
+   Logging->writeLine("Spawning map\r\n");
 
    int playerId = 0;
 
@@ -233,7 +238,7 @@ bool Game::handleMove(ENetPeer *peer, ENetPacket *packet) {
           vMoves.at(i).y = y;
       }
 
-      printf("Stopped at x:%f , y: %f\n", x,y);
+      Logging->writeLine("Stopped at x:%f , y: %f\n", x,y);
       break;
    }
    case EMOTE:
@@ -259,7 +264,7 @@ bool Game::handleLoadPing(ENetPeer *peer, ENetPacket *packet) {
     memcpy(&response, packet->data, sizeof(PingLoadInfo));
     response.header.cmd = PKT_S2C_Ping_Load_Info;
     response.userId = peerInfo(peer)->userId;
-    //Logging->writeLine("loaded: %f, ping: %f, %f\n", loadInfo->loaded, loadInfo->ping, loadInfo->f3);
+    Logging->writeLine("loaded: %f, ping: %f, %f\n", loadInfo->loaded, loadInfo->ping, loadInfo->f3);
     bool bRet = broadcastPacket(reinterpret_cast<uint8 *>(&response), sizeof(PingLoadInfo), CHL_LOW_PRIORITY, UNRELIABLE);
     static bool bLoad = false;
     if(!bLoad) {
@@ -276,7 +281,7 @@ bool Game::handleQueryStatus(HANDLE_ARGS) {
 
 bool Game::handleClick(HANDLE_ARGS) {
    Click *click = reinterpret_cast<Click *>(packet->data);
-   printf("Object %u clicked on %u\n", peerInfo(peer)->getChampion()->getNetId(),click->targetNetId);
+   Logging->writeLine("Object %u clicked on %u\n", peerInfo(peer)->getChampion()->getNetId(),click->targetNetId);
    
    return true;
 }
@@ -284,7 +289,7 @@ bool Game::handleClick(HANDLE_ARGS) {
 bool Game::handleCastSpell(HANDLE_ARGS) {
    CastSpell *spell = reinterpret_cast<CastSpell *>(packet->data);
 
-   printf("Spell Cast : Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X\n", spell->spellSlot & 0x3F, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
+   Logging->writeLine("Spell Cast : Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X\n", spell->spellSlot & 0x3F, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
 
    Spell* s = peerInfo(peer)->getChampion()->castSpell(spell->spellSlot & 0x3F, spell->x, spell->y, 0);
 
@@ -302,10 +307,28 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
     ChatMessage *message = reinterpret_cast<ChatMessage *>(packet->data);
     //Lets do commands
     if(message->msg == '.') {
-        const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn", ".size", ".spawnjungle", ".skillpoints" };
+        const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn", ".size", ".spawnjungle", ".skillpoints", ".cooldown" };
         // help command
-        if (strncmp(message->getMessage(), cmd[9], strlen(cmd[9])) == 0){
-           return true;
+        if (strncmp(message->getMessage(), cmd[9], strlen(cmd[9])) == 0)
+		{
+			//".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn"
+
+			//Max 255 chars per message and only 11 messages at once!
+			SendServerMessage(peer, ".set [blocknumber] [fieldnumber] [value] - Sets a value in stats field\n"
+									"\t.gold [value] - sets gold\n"
+									"\t.speed [value] - sets movement speed");
+			SendServerMessage(peer, ".health [value] - sets max health\n"
+									".xp [value] - sets Experience\n"
+									".ad [value] - sets Attack damage");
+			SendServerMessage(peer, ".mana [value] - sets max mana\n"
+									".model [name] - replaces current model with new one\n"
+									".help - opens this help message");
+			SendServerMessage(peer, ".spawn - spawns 3 minions per side\n"
+									".spawnjungle [baron/wolves/red/blue/dragon/wraiths/golems] - Spawns a specific type of jungle monster\n"
+									".skillpoints - Enable all skillpoints (like set to level 18)");
+			SendServerMessage(peer, ".cooldown [spellNo] [value] - Set cooldown of a specific (SpellNo) spell");
+
+			return true;
         }
         //Set field
         if(strncmp(message->getMessage(), cmd[0], strlen(cmd[0])) == 0) {
@@ -329,30 +352,15 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
         {
            float data = (float)atoi(&message->getMessage()[strlen(cmd[2])+1]);
            
-           printf("Setting speed to %f\n", data);
-           
+		   std::stringstream ss;
+		   ss << "Setting speed to " << data;
+		   Logging->writeLine(ss.str().c_str());
+		   SendServerMessage(peer, ss.str());
+
            peerInfo(peer)->getChampion()->getStats().setMovementSpeed(data);
            return true;
         }
-        
-         //spawn
-         if(strncmp(message->getMessage(), cmd[10], strlen(cmd[10])) == 0)
-         {
-            static const MinionSpawnPosition positions[] = {   SPAWN_BLUE_TOP,
-                                                               SPAWN_BLUE_BOT,
-                                                               SPAWN_BLUE_MID,
-                                                               SPAWN_RED_TOP,
-                                                               SPAWN_RED_BOT,
-                                                               SPAWN_RED_MID, 
-                                                            };
-                          
-            for(int i = 0; i < 6; ++i) {                                     
-               Minion* m = new Minion(map, GetNewNetID(), MINION_TYPE_MELEE, positions[i]);
-               map->addObject(m);
-               notifyMinionSpawned(m);
-            }
-            return true;
-         }
+
          
         //health
         if(strncmp(message->getMessage(), cmd[3], strlen(cmd[3])) == 0)
@@ -364,6 +372,11 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
            
            notifySetHealth(peerInfo(peer)->getChampion());
            
+		   std::stringstream ss;
+		   ss << "Setting Health to " << data;
+		   Logging->writeLine(ss.str().c_str());
+		   SendServerMessage(peer, ss.str());
+
            return true;
         }
         
@@ -372,8 +385,11 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
         {
            float data = (float)atoi(&message->getMessage()[strlen(cmd[5])+1]);
            
-           printf("Setting experience to %f\n", data);
-           
+		   std::stringstream ss;
+		   ss << "Setting experience to " << data;
+		   Logging->writeLine(ss.str().c_str());
+		   SendServerMessage(peer, ss.str());
+
            peerInfo(peer)->getChampion()->getStats().setExp(data);
            return true;
         }
@@ -382,8 +398,11 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
         {
            float data = (float)atoi(&message->getMessage()[strlen(cmd[5])+1]);
            
-           printf("Setting AP to %f\n", data);
-           
+		   std::stringstream ss;
+		   ss << "Setting AP to " << data;
+		   Logging->writeLine(ss.str().c_str());
+		   SendServerMessage(peer, ss.str());
+
            peerInfo(peer)->getChampion()->getStats().setBaseAp(data);
            return true;
         }
@@ -392,8 +411,12 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
         {
            float data = (float)atoi(&message->getMessage()[strlen(cmd[5])+1]);
            
-           printf("Setting AD to %f\n", data);
            
+		   std::stringstream ss;
+		   ss << "Setting AD to " << data;
+		   Logging->writeLine(ss.str().c_str());
+		   SendServerMessage(peer, ss.str());
+
            peerInfo(peer)->getChampion()->getStats().setBaseAd(data);
            return true;
         }
@@ -402,8 +425,11 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
         {
            float data = (float)atoi(&message->getMessage()[strlen(cmd[5])+1]);
            
-           printf("Setting Mana to %f\n", data);
-           
+		   std::stringstream ss;
+		   ss << "Setting Mana to " << data;
+           Logging->writeLine(ss.str().c_str());
+           SendServerMessage(peer, ss.str());
+
            peerInfo(peer)->getChampion()->getStats().setCurrentMana(data);
          peerInfo(peer)->getChampion()->getStats().setMaxMana(data);
            return true;
@@ -416,76 +442,123 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
             return true;
         }
         //Size
-   if(strncmp(message->getMessage(), cmd[11], strlen(cmd[11])) == 0) {
-      float data = (float)atoi(&message->getMessage()[strlen(cmd[11])+1]);
-         
-      printf("Setting size to %f\n", data);
-         
-      peerInfo(peer)->getChampion()->getStats().setSize(data);
-      return true;
-   }
+		if(strncmp(message->getMessage(), cmd[11], strlen(cmd[11])) == 0) {
+			float data = (float)atoi(&message->getMessage()[strlen(cmd[11])+1]);
+
+			std::stringstream ss;
+			ss << "Setting size to " << data;
+			Logging->writeLine(ss.str().c_str());
+			SendServerMessage(peer, ss.str());
+
+			peerInfo(peer)->getChampion()->getStats().setSize(data);
+			return true;
+		}
         
-   if(strncmp(message->getMessage(), cmd[13], strlen(cmd[13])) == 0) {
-       
-       peerInfo(peer)->getChampion()->setSkillPoints(17);
-        
-    SkillUpResponse skillUpResponse(peerInfo(peer)->getChampion()->getNetId(), 0, 0, 17);
-    sendPacket(peer, skillUpResponse, CHL_GAMEPLAY);
+		//Skillpoints
+		if(strncmp(message->getMessage(), cmd[13], strlen(cmd[13])) == 0) {
+
+			peerInfo(peer)->getChampion()->setSkillPoints(17);
+
+			SkillUpResponse skillUpResponse(peerInfo(peer)->getChampion()->getNetId(), 0, 0, 17);
+			sendPacket(peer, skillUpResponse, CHL_GAMEPLAY);
+
+			return true;
+
+		}
+
+		//cooldown
+		if(strncmp(message->getMessage(), cmd[14], strlen(cmd[14])) == 0)
+		{
+			uint32 spellNo;
+			float value;
+
+			sscanf(&message->getMessage()[strlen(cmd[14])+1], "%u %f", &spellNo, &value);
+			Spell* s = peerInfo(peer)->getChampion()->GetSpell(spellNo-1);
+			s->setCooldown(s->getLevel(),value);
+
+			return true;
+		}
     
-   }
-    
-    // Mob Spawning-Creating
-  if(strncmp(message->getMessage(), cmd[12], strlen(cmd[12])) == 0) {
-	const char *cmd[] = { "baron" , "wolves", "red", "blue", "dragon", "wraiths", "golems"};
-	if(strncmp(message->getMessage(), cmd[0], strlen(cmd[0])) == 0) {
-		LevelPropSpawn lpSpawn5(GetNewNetID(), "Worm", "Worm", 4569, 10193, -63.1034774f);
-		sendPacket(peer, lpSpawn5, CHL_S2C);
-	}
-	if(strncmp(message->getMessage(), cmd[1], strlen(cmd[1])) == 0) {
-		LevelPropSpawn lpSpawn7(GetNewNetID(), "Wolf", "Wolf",  3524, 6223, 56);
-		sendPacket(peer, lpSpawn7, CHL_S2C);
-		LevelPropSpawn lpSpawn8(GetNewNetID(), "GiantWolf", "GiantWolf", 3374, 6223, 56);
-		sendPacket(peer, lpSpawn8, CHL_S2C);
-		LevelPropSpawn lpSpawn9(GetNewNetID(), "Wolf", "Wolf", 3324, 6373, 56);
-		sendPacket(peer, lpSpawn9, CHL_S2C);
-	}
-	if(strncmp(message->getMessage(), cmd[2], strlen(cmd[2])) == 0) {
-		LevelPropSpawn lpSpawn10(GetNewNetID(), "YoungLizard", "YoungLizard", 7273, 3887, 55);
-		sendPacket(peer, lpSpawn10, CHL_S2C);
-		LevelPropSpawn lpSpawn11(GetNewNetID(), "LizardElder", "LizardElder", 7429, 3905, 56);
-		sendPacket(peer, lpSpawn11, CHL_S2C);
-		LevelPropSpawn lpSpawn12(GetNewNetID(), "YoungLizard", "YoungLizard", 7433, 3657, 54);
-		sendPacket(peer, lpSpawn12, CHL_S2C);
-	}
-	if(strncmp(message->getMessage(), cmd[3], strlen(cmd[3])) == 0) {
-		LevelPropSpawn lpSpawn13(GetNewNetID(), "YoungLizard", "YoungLizard", 3521, 7751, 54);
-		sendPacket(peer, lpSpawn13, CHL_S2C);
-		LevelPropSpawn lpSpawn14(GetNewNetID(), "AncientGolem", "AncientGolem", 3547, 7613, 55);
-		sendPacket(peer, lpSpawn14, CHL_S2C);
-		LevelPropSpawn lpSpawn15(GetNewNetID(), "YoungLizard", "YoungLizard",  3437, 7641, 55);
-		sendPacket(peer, lpSpawn15, CHL_S2C);
-	}
-	if(strncmp(message->getMessage(), cmd[4], strlen(cmd[4])) == 0) {
-		LevelPropSpawn lpSpawn16(GetNewNetID(), "redDragon", "redDragon", 9447, 4155, -61);
-		sendPacket(peer, lpSpawn16, CHL_S2C);
-	}
-	if(strncmp(message->getMessage(), cmd[5], strlen(cmd[5])) == 0) {
-	LevelPropSpawn lpSpawn17(GetNewNetID(), "LesserWraith", "LesserWraith", 6697, 5215, 57);
-	sendPacket(peer, lpSpawn17, CHL_S2C);
-	LevelPropSpawn lpSpawn18(GetNewNetID(), "LesserWraith", "LesserWraith", 6647, 5065, 52);
-	sendPacket(peer, lpSpawn18, CHL_S2C);
-	LevelPropSpawn lpSpawn19(GetNewNetID(), "LesserWraith", "LesserWraith", 6547, 5365, 61);
-	sendPacket(peer, lpSpawn19, CHL_S2C);
-	LevelPropSpawn lpSpawn20(GetNewNetID(), "Wraith", "Wraith", 6447, 5165, 54);
-	sendPacket(peer, lpSpawn20, CHL_S2C);
-	}
-	if(strncmp(message->getMessage(), cmd[6], strlen(cmd[6])) == 0) {
-		LevelPropSpawn lpSpawn21(GetNewNetID(), "Golem", "Golem", 8195, 2615, 54);
-		sendPacket(peer, lpSpawn21, CHL_S2C);
-		LevelPropSpawn lpSpawn22(GetNewNetID(), "SmallGolem", "SmallGolem", 7887, 2461, 54);
-		sendPacket(peer, lpSpawn22, CHL_S2C);
-	}
-    }
+		// Mob Spawning-Creating
+		if(strncmp(message->getMessage(), cmd[12], strlen(cmd[12])) == 0) {
+			const char *mcmd[] = { "baron" , "wolves", "red", "blue", "dragon", "wraiths", "golems"};
+
+			char tmp[255];
+			sscanf(&message->getMessage()[strlen(cmd[12])+1], "%s", tmp);
+			std::string mob(tmp);
+
+
+			if(mob == mcmd[0]){
+				LevelPropSpawn lpSpawn5(GetNewNetID(), "Worm", "Worm", 4569, 10193, -63.1034774f);
+				sendPacket(peer, lpSpawn5, CHL_S2C);
+			}
+			if(mob == mcmd[1]){
+				LevelPropSpawn lpSpawn7(GetNewNetID(), "Wolf", "Wolf",  3524, 6223, 56);
+				sendPacket(peer, lpSpawn7, CHL_S2C);
+				LevelPropSpawn lpSpawn8(GetNewNetID(), "GiantWolf", "GiantWolf", 3374, 6223, 56);
+				sendPacket(peer, lpSpawn8, CHL_S2C);
+				LevelPropSpawn lpSpawn9(GetNewNetID(), "Wolf", "Wolf", 3324, 6373, 56);
+				sendPacket(peer, lpSpawn9, CHL_S2C);
+			}
+			if(mob == mcmd[2]){
+				LevelPropSpawn lpSpawn10(GetNewNetID(), "YoungLizard", "YoungLizard", 7273, 3887, 55);
+				sendPacket(peer, lpSpawn10, CHL_S2C);
+				LevelPropSpawn lpSpawn11(GetNewNetID(), "LizardElder", "LizardElder", 7429, 3905, 56);
+				sendPacket(peer, lpSpawn11, CHL_S2C);
+				LevelPropSpawn lpSpawn12(GetNewNetID(), "YoungLizard", "YoungLizard", 7433, 3657, 54);
+				sendPacket(peer, lpSpawn12, CHL_S2C);
+			}
+			if(mob == mcmd[3]){
+				LevelPropSpawn lpSpawn13(GetNewNetID(), "YoungLizard", "YoungLizard", 3521, 7751, 54);
+				sendPacket(peer, lpSpawn13, CHL_S2C);
+				LevelPropSpawn lpSpawn14(GetNewNetID(), "AncientGolem", "AncientGolem", 3547, 7613, 55);
+				sendPacket(peer, lpSpawn14, CHL_S2C);
+				LevelPropSpawn lpSpawn15(GetNewNetID(), "YoungLizard", "YoungLizard",  3437, 7641, 55);
+				sendPacket(peer, lpSpawn15, CHL_S2C);
+			}
+			if(mob == mcmd[4]){
+				LevelPropSpawn lpSpawn16(GetNewNetID(), "redDragon", "redDragon", 9447, 4155, -61);
+				sendPacket(peer, lpSpawn16, CHL_S2C);
+			}
+			if(mob == mcmd[5]){
+				LevelPropSpawn lpSpawn17(GetNewNetID(), "LesserWraith", "LesserWraith", 6697, 5215, 57);
+				sendPacket(peer, lpSpawn17, CHL_S2C);
+				LevelPropSpawn lpSpawn18(GetNewNetID(), "LesserWraith", "LesserWraith", 6647, 5065, 52);
+				sendPacket(peer, lpSpawn18, CHL_S2C);
+				LevelPropSpawn lpSpawn19(GetNewNetID(), "LesserWraith", "LesserWraith", 6547, 5365, 61);
+				sendPacket(peer, lpSpawn19, CHL_S2C);
+				LevelPropSpawn lpSpawn20(GetNewNetID(), "Wraith", "Wraith", 6447, 5165, 54);
+				sendPacket(peer, lpSpawn20, CHL_S2C);
+			}
+			if(mob == mcmd[6]){
+				LevelPropSpawn lpSpawn21(GetNewNetID(), "Golem", "Golem", 8195, 2615, 54);
+				sendPacket(peer, lpSpawn21, CHL_S2C);
+				LevelPropSpawn lpSpawn22(GetNewNetID(), "SmallGolem", "SmallGolem", 7887, 2461, 54);
+				sendPacket(peer, lpSpawn22, CHL_S2C);
+			}
+
+			return true;
+		}
+
+
+		//spawn
+		if(strncmp(message->getMessage(), cmd[10], strlen(cmd[10])) == 0)
+		{
+			static const MinionSpawnPosition positions[] = {   SPAWN_BLUE_TOP,
+				SPAWN_BLUE_BOT,
+				SPAWN_BLUE_MID,
+				SPAWN_RED_TOP,
+				SPAWN_RED_BOT,
+				SPAWN_RED_MID, 
+			};
+
+			for(int i = 0; i < 6; ++i) {                                     
+				Minion* m = new Minion(map, GetNewNetID(), MINION_TYPE_MELEE, positions[i]);
+				map->addObject(m);
+				notifyMinionSpawned(m);
+			}
+			return true;
+		}
     }
 
 

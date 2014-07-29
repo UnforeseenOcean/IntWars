@@ -20,11 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+
 #include "stdafx.h"
 #include "Game.h"
 #include "SummonersRift.h"
 
 #define REFRESH_RATE 5
+
+using namespace std;
 
 uint32 GetNewNetID() {
 	static uint32 dwStart = 0x40000001;
@@ -54,87 +57,98 @@ bool Game::initialize(ENetAddress *address, const char *baseKey)
 	if(_server == NULL)
 		return false;
 
-	std::string key = base64_decode(baseKey);
+	string key = base64_decode(baseKey);
 	if(key.length() <= 0)
 		return false;
       
 	_blowfish = new BlowFish((uint8*)key.c_str(), 16);
 	initHandlers();
    
-   map = new SummonersRift(this);
+	map = new SummonersRift(this);
    
-   // TODO : put the following in a config file !
-   ClientInfo* player = new ClientInfo();
-   player->setName("Test");
-   Champion* c = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
-   c->setPosition(35.90f, 273.55f);
-   map->addObject(c);
-   player->setChampion(c);
-   player->setSkinNo(6);
-   player->userId = 47917791; // same as StartClient.bat
-   player->setSummoners(SPL_Ignite, SPL_Flash);
+
+	// Uncomment the following to get 2-players
+	/*ClientInfo* player2 = new ClientInfo();
+	player2->setName("tseT");
+	Champion* c2 = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
+	c2->setPosition(100.f, 273.55f);
+	map->addObject(c2);
+	player2->setChampion(c2);
+	player2->setSkinNo(5);
+	player2->userId = 47917792; // same as StartClient.bat
+	player2->setSummoners(SPL_Ignite, SPL_Flash);
    
-   players.push_back(player);
-   
-   // Uncomment the following to get 2-players
-   /*ClientInfo* player2 = new ClientInfo();
-   player2->setName("tseT");
-   Champion* c2 = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
-   c2->setPosition(100.f, 273.55f);
-   map->addObject(c2);
-   player2->setChampion(c2);
-   player2->setSkinNo(5);
-   player2->userId = 47917792; // same as StartClient.bat
-   player2->setSummoners(SPL_Ignite, SPL_Flash);
-   
-   players.push_back(player2);*/
+	players.push_back(player2);*/
 	
 	return _isAlive = true;
 }
 
 void Game::netLoop()
 {
-	ENetEvent event;
-	std::chrono::time_point<std::chrono::high_resolution_clock> tStart, tEnd;
-	tStart = std::chrono::high_resolution_clock::now();
+	chrono::time_point<chrono::system_clock> tStart, tEnd;
+	tStart = chrono::high_resolution_clock::now();
 	long long tDiff;
+	ENetEvent event;
 
+	ClientInfo* player = 0;
+	Champion* c = 0;
+
+	std::stringstream ss;
 	while(true)
 	{
-      while(enet_host_service(_server, & event, 0) > 0) {
-         switch (event.type)
-         {
-         case ENET_EVENT_TYPE_CONNECT:
-            //Logging->writeLine("A new client connected: %i.%i.%i.%i:%i \n", event.peer->address.host & 0xFF, (event.peer->address.host >> 8) & 0xFF, (event.peer->address.host >> 16) & 0xFF, (event.peer->address.host >> 24) & 0xFF, event.peer->address.port);
+		while(enet_host_service(_server, & event, 0) > 0) 
+		{
+			switch (event.type)
+			{
+			case ENET_EVENT_TYPE_CONNECT:
+				//Logging->writeLine("A new client connected: %i.%i.%i.%i:%i \n", event.peer->address.host & 0xFF, (event.peer->address.host >> 8) & 0xFF, (event.peer->address.host >> 16) & 0xFF, (event.peer->address.host >> 24) & 0xFF, event.peer->address.port);
 
-            /* Set some defaults */
-            event.peer->mtu = PEER_MTU;
-            event.data = 0;
+				/* Set some defaults */
+				event.peer->mtu = PEER_MTU;
+				event.data = 0;
 
-            break;
+				// TODO : put the following in a config file !
+				player = new ClientInfo();
 
-         case ENET_EVENT_TYPE_RECEIVE:
-            currentPeer = event.peer;
-            if(!handlePacket(event.peer, event.packet,event.channelID))
-            {
-               //enet_peer_disconnect(event.peer, 0);
-            }
+				ss.str("");
+				ss << "Player" << (players.size()+1);
+				player->setName(ss.str());
+				c = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
+				c->setPosition(35.90f, 273.55f);
+				map->addObject(c);
+				player->setChampion(c);
+				player->setSkinNo(6);
+				player->userId = 47917791; // same as StartClient.bat
+				player->setSummoners(SPL_Ignite, SPL_Flash);
 
-            /* Clean up the packet now that we're done using it. */
-            enet_packet_destroy (event.packet);
-            break;
+				players.push_back(player);
 
-         case ENET_EVENT_TYPE_DISCONNECT:
-            delete (ClientInfo*)event.peer->data;
-            break;
-         }
-      }
-      tEnd = tStart;
-	   tStart = std::chrono::high_resolution_clock::now();
-	   tDiff = std::chrono::duration_cast<std::chrono::microseconds>(tStart - tEnd).count();
-      if(_started) {
-         map->update(tDiff);
-      }
-      std::this_thread::sleep_for(std::chrono::microseconds(REFRESH_RATE*1000));
-   }
+				break;
+
+			case ENET_EVENT_TYPE_RECEIVE:
+				currentPeer = event.peer;
+				if(!handlePacket(event.peer, event.packet,event.channelID))
+				{
+				   enet_peer_disconnect(event.peer, 0);
+				}
+
+				/* Clean up the packet now that we're done using it. */
+				enet_packet_destroy (event.packet);
+				break;
+
+			case ENET_EVENT_TYPE_DISCONNECT:
+				delete (ClientInfo*)event.peer->data;
+				break;
+			}
+		}
+		tEnd = tStart;
+		tStart = std::chrono::high_resolution_clock::now();
+		tDiff = std::chrono::duration_cast<std::chrono::microseconds>(tStart - tEnd).count();
+    
+		if(_started) {
+			map->update(tDiff);
+		}
+    
+		sleep(REFRESH_RATE);
+	}
 }

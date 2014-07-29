@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Object.h"
 #include <cmath>
 #include <algorithm>
@@ -40,7 +41,7 @@ void Object::Move(int64 diff) {
 	if(!target)
 	  return;
 	
-	calculateVector(target->getX(), target->getY());
+	calculateVector(target->x, target->y);
 
 	float factor = 0.000001f*diff*getMoveSpeed();
 
@@ -48,7 +49,7 @@ void Object::Move(int64 diff) {
 	y += factor*yvector;
 	
 	/* If the target was a simple point, stop when it is reached */
-	if(target->isSimpleTarget() && distanceWith(target) < factor) {
+	if(target->isSimpleTarget() && distance(*target) < factor) {
 	   if(++curWaypoint >= waypoints.size()) {
          setTarget(0);
       } else {

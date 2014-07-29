@@ -16,7 +16,8 @@ enum DamageSource {
 
 class AI;
 
-class Unit : public Object {
+class Unit : public Object 
+{
 
 protected:
    Stats* stats;
@@ -25,10 +26,10 @@ protected:
 
 public:
     
-           bool needsToTeleport = false;
-           float teleportToX= 0, teleportToY = 0;
+	bool needsToTeleport;
+	float teleportToX, teleportToY;
     
-   Unit(Map* map, uint32 id, Stats* stats, float x = 0, float y = 0, AI* ai = 0) : Object(map, id, x, y, 40, 40), stats(stats), ai(ai) { }
+   Unit(Map* map, uint32 id, Stats* stats, float x = 0, float y = 0, AI* ai = 0) : Object(map, id, x, y, 40, 40), stats(stats), ai(ai), needsToTeleport(false), teleportToX(0), teleportToY(0) { }
    virtual ~Unit();
    Stats& getStats() { return *stats; }
    virtual void update(int64 diff);

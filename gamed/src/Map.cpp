@@ -1,5 +1,7 @@
+#include "stdafx.h"
 #include "Map.h"
 #include "Game.h"
+
 
 void Map::update(int64 diff) {
    for(auto kv = objects.begin(); kv != objects.end();) {
@@ -36,6 +38,53 @@ void Map::update(int64 diff) {
       
       ++kv;
    }
+}
+
+bool Map::Init(ENetPeer *peer)
+{
+	int blueTeam=0;
+	int redTeam=0;
+	LoadScreenInfo screenInfo;
+
+	//Builds team info
+	for(int i=0; i < game->players.size();i++)
+	{
+		if(game->players[i]->team == TEAM_BLUE)
+		{
+			blueTeam++;
+			screenInfo.bluePlayerIds[i] = game->players[i]->userId;
+		}
+		else
+		{
+			redTeam++;
+			screenInfo.redPlayersIds[i] = game->players[i]->userId;
+		}
+	}
+
+	screenInfo.bluePlayerNo = blueTeam;
+	screenInfo.redPlayerNo = redTeam;
+
+	bool pInfo = game->sendPacket(peer, reinterpret_cast<uint8 *>(&screenInfo), sizeof(LoadScreenInfo), CHL_LOADING_SCREEN);
+
+	bool noerr;
+
+	//For all players send this info
+	for(int i=0; i < game->players.size();i++)
+	{
+		LoadScreenPlayerName playerName(*game->players[i]);
+		LoadScreenPlayerChampion playerHero(*game->players[i]);
+
+		noerr = game->sendPacket(peer,playerName, CHL_LOADING_SCREEN);
+		if(!noerr)
+			break;
+
+		noerr = game->sendPacket(peer,playerHero, CHL_LOADING_SCREEN);	
+		if(!noerr)
+			break;
+	}
+
+
+	return (pInfo && noerr);
 }
 
 Object* Map::getObjectById(uint32 id) {
