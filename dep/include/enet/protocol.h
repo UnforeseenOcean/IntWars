@@ -81,6 +81,7 @@ typedef struct _ENetProtocolConnect
 {
    ENetProtocolCommandHeader header;
    enet_uint8 outgoingPeerID;
+   enet_uint8 unk;
    enet_uint16 mtu;
    enet_uint32 windowSize;
    enet_uint32 channelCount;
@@ -96,6 +97,7 @@ typedef struct _ENetProtocolVerifyConnect
 {
    ENetProtocolCommandHeader header;
    enet_uint8 outgoingPeerID;
+   enet_uint8 unk;
    enet_uint16 mtu;
    enet_uint32 windowSize;
    enet_uint32 channelCount;

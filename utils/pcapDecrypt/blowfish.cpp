@@ -1,5 +1,5 @@
 #include <cstring>
-#include <blowfish.h>
+#include "blowfish.h"
 
 uint64 ntohll(uint64 a)
 {

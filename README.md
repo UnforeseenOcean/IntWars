@@ -1,8 +1,12 @@
-RipWars
+IntWars
 ==================
 About
 ------
-Fork of the 2 years old outdated project, emulates LoL server environment
+New: Website to provide a central location to discuss the project! http://leaguesandbox.com/
+
+Fork of the 2 year old (outdated project), IntWars. Emulates LoL server environment.  
+If you want to contribute to the project, please fork the repo and upload any progress to GitHub.  
+If you need help compiling the source on Windows, [check here](http://leaguesandbox.com/forum/viewtopic.php?f=6&t=4).
 
 Content:
 * Load Screen: http://puu.sh/8cbhW.jpg
@@ -11,44 +15,45 @@ Content:
 
 Instructions:
 * Run gamed.exe
-* Run the game with this command line: "League of Legends.exe" "8394" "LoLLauncher.exe" "C:/Riot Games/League of Legends/RADS/projects/lol_air_client/releases/0.0.1.79/deploy/LolClient.exe" "127.0.0.1 5119 17BLOhi6KZsTtldTsizvHg== 1"
-* 1 Represents the playerID
+* Run StartClient.bat
+* If StartClient.bat does not work, run the game with this command: "League of Legends.exe" "8394" "LoLLauncher.exe" "C:/Riot Games/League of Legends/RADS/projects/lol_air_client/releases/0.0.1.79/deploy/LolClient.exe" "127.0.0.1 5119 17BLOhi6KZsTtldTsizvHg== 47917791"
 
-~~This is the development part of the [HeroWars](https://github.com/Intline9/HeroWars)  project. Here we can try everything out without worrying with the code base.~~
+Important rules and information
+---------
+* Use this style reference for all your code: http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml
+* Keep this project clean and simple
+* The project is using parts of the C++ 2011 standard.
 
-Old Members - No commit for 2 years
+Original Creators
 -------
 * Intline9 - intline9(at)gmail(dot)com
 * Ltsstar
 
-Important rules
----------
-* Use this style reference for all your code: http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml
-* Keep this project clean and simple
+Other Important Contributors
+-------
+* Elyotna (reddit: ?)
+* Spudgy (reddit: imSpudgy)
+* ProudHeart (reddit: chutch1122)
+* 0x2A
+* thaxy
+
 
 License
 -------
 GPLv3 as sharing is caring, and when ever you extend/use/modify/fix any of this project you should share it again!
 
-Contributing
-------------
-~~Want to join? Contact us and show us some work.~~
-
-Please fork and upload any progress.
-
 Contact
 -------
-We are at irc.rizon.net#botoflegends (Active)
-Join if you made any progress with this so far.
+For information relating to this fork, contact me on reddit: chutch1122  
+I'm working on setting up a website where we can organize this better. http://leaguesandbox.com/
 
-or Bot of Legends forums (www.botoflegends.com/forum/)
+Notes for Compiling on Windows
+---------
+Note: This is a very basic explanation. I am working on a more detailed explanation, but don't have the time right now.
 
-Notes
--------
-I updated this project on my free time, so anyone who cares can fiddle with it at the latest game version.
+This project uses elements from C++11, like initialization lists. Visual Studio does not support initialization lists in the 2010 or 2012 versions. Therefore, I recommend installing/using CMake and MinGW's g++ compiler.
 
-
-My reddit username is 'imSpudgy', the topic author who posted it to front page is fake, I did not announce this project anywhere.
+[You can find a guide for setting that all up here!](http://leaguesandbox.com/forum/viewtopic.php?f=6&t=4)
 
 Uploaded latest binary to BinWars folder.
 
