@@ -308,7 +308,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
 	ChatMessage *message = reinterpret_cast<ChatMessage *>(packet->data);
 	//Lets do commands
 	if(message->msg == '.') {
-		const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn", ".size", ".spawnjungle", ".skillpoints", ".cooldown" };
+		const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn", ".size", ".spawnjungle", ".skillpoints", ".cooldown", ".announce" };
 		// help command
 		if (strncmp(message->getMessage(), cmd[9], strlen(cmd[9])) == 0)
 		{
@@ -328,6 +328,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
 				".spawnjungle [baron/wolves/red/blue/dragon/wraiths/golems] - Spawns a specific type of jungle monster\n"
 				".skillpoints - Enable all skillpoints (like set to level 18)");
 			SendServerMessage(peer, ".cooldown [spellNo] [value] - Set cooldown of a specific (SpellNo) spell");
+			SendServerMessage(peer, ".announce - Calls the announcer");
 
 			return true;
 		}
@@ -477,6 +478,14 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
 			Spell* s = peerInfo(peer)->getChampion()->GetSpell(spellNo-1);
 			s->setCooldown(s->getLevel(),value);
 
+			return true;
+		}
+
+		//announce
+		if(strncmp(message->getMessage(), cmd[15], strlen(cmd[15])) == 0)
+		{
+			Announce announcement30SecondsUntilMinions(0x73, 1);
+			broadcastPacket(reinterpret_cast<uint8 *>(&announcement30SecondsUntilMinions), sizeof(announcement30SecondsUntilMinions), CHL_S2C);
 			return true;
 		}
 

@@ -48,7 +48,7 @@ enum PacketCmd : uint8
    PKT_S2C_Emotion = 0x42,
    PKT_C2S_Emotion = 0x48,
    PKT_S2C_HeroSpawn = 0x4C,  // 4.12
-   PKT_S2C_Announce = 0x4D,   // 4.12
+   PKT_S2C_Announce = 0x45,   // 4.12
 
    PKT_S2C_GameTimer = 0xC0,
    PKT_S2C_GameTimerUpdate = 0xC1,

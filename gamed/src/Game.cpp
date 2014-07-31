@@ -66,19 +66,17 @@ bool Game::initialize(ENetAddress *address, const char *baseKey)
    
 	map = new SummonersRift(this);
    
-
-	// Uncomment the following to get 2-players
-	/*ClientInfo* player2 = new ClientInfo();
-	player2->setName("tseT");
-	Champion* c2 = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
-	c2->setPosition(100.f, 273.55f);
-	map->addObject(c2);
-	player2->setChampion(c2);
-	player2->setSkinNo(5);
-	player2->userId = 47917792; // same as StartClient.bat
-	player2->setSummoners(SPL_Ignite, SPL_Flash);
-   
-	players.push_back(player2);*/
+	 //Uncomment the following to get 2-players
+	//ClientInfo* player2 = new ClientInfo();
+	//player2->setName("tseT");
+	//Champion* c2 = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
+	//c2->setPosition(100.f, 273.55f);
+	//map->addObject(c2);
+	//player2->setChampion(c2);
+	//player2->setSkinNo(5);
+	//player2->userId = 47917792; // same as StartClient.bat
+	//player2->setSummoners(SPL_Ignite, SPL_Flash);
+	//players.push_back(player2);
 	
 	return _isAlive = true;
 }
@@ -101,7 +99,7 @@ void Game::netLoop()
 			switch (event.type)
 			{
 			case ENET_EVENT_TYPE_CONNECT:
-				//Logging->writeLine("A new client connected: %i.%i.%i.%i:%i \n", event.peer->address.host & 0xFF, (event.peer->address.host >> 8) & 0xFF, (event.peer->address.host >> 16) & 0xFF, (event.peer->address.host >> 24) & 0xFF, event.peer->address.port);
+				Logging->writeLine("A new client connected: %i.%i.%i.%i:%i \n", event.peer->address.host & 0xFF, (event.peer->address.host >> 8) & 0xFF, (event.peer->address.host >> 16) & 0xFF, (event.peer->address.host >> 24) & 0xFF, event.peer->address.port);
 
 				/* Set some defaults */
 				event.peer->mtu = PEER_MTU;
