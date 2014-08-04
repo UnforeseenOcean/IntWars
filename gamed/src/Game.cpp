@@ -66,20 +66,41 @@ bool Game::initialize(ENetAddress *address, const char *baseKey)
    
 	map = new SummonersRift(this);
    
+
+	ClientInfo* player = 0;
+	Champion* c = 0;
+	// TODO : put the following in a config file !
+	player = new ClientInfo("GOLD", TEAM_PURPLE);
+
+
+	std::stringstream ss;
+	ss.str("");
+	ss << "Player" << (players.size()+1);
+	player->setName(ss.str());
+	c = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
+	c->setPosition(35.90f, 273.55f);
+	map->addObject(c);
+	player->setChampion(c);
+	player->setSkinNo(6);
+	player->userId = 1; // same as StartClient.bat
+	player->setSummoners(SPL_Ignite, SPL_Flash);
+
+	players.push_back(player);
+
    
 	 //Uncomment the following to get 2-players
-	//ClientInfo* player2 = new ClientInfo();
-	//player2->setName("tseT");
-	//Champion* c2 = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
-	//c2->setPosition(100.f, 273.55f);
-	//map->addObject(c2);
-        //c2->setSide(1);
-	//player2->setChampion(c2);
-	//player2->setSkinNo(4);
-        //player2->userId = 2; // same as StartClient.bat
-        //player2->setSummoners(SPL_Ignite, SPL_Flash);
-	//players.push_back(player2);
-	//
+	ClientInfo* player2 = new ClientInfo("GOLD", TEAM_BLUE);
+	player2->setName("tseT");
+	Champion* c2 = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
+	c2->setPosition(100.f, 273.55f);
+	map->addObject(c2);
+    c2->setSide(1);
+	player2->setChampion(c2);
+	player2->setSkinNo(4);
+    player2->userId = 2; // same as StartClient.bat
+    player2->setSummoners(SPL_Ignite, SPL_Flash);
+	players.push_back(player2);
+	
 	
 	return _isAlive = true;
 }
@@ -91,10 +112,8 @@ void Game::netLoop()
 	long long tDiff;
 	ENetEvent event;
 
-	ClientInfo* player = 0;
-	Champion* c = 0;
+	
 
-	std::stringstream ss;
 	while(true)
 	{
 		while(enet_host_service(_server, & event, 0) > 0) 
@@ -108,21 +127,7 @@ void Game::netLoop()
 				event.peer->mtu = PEER_MTU;
 				event.data = 0;
 
-				// TODO : put the following in a config file !
-				player = new ClientInfo("GOLD", TEAM_PURPLE);
 
-				ss.str("");
-				ss << "Player" << (players.size()+1);
-				player->setName(ss.str());
-				c = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
-				c->setPosition(35.90f, 273.55f);
-				map->addObject(c);
-				player->setChampion(c);
-				player->setSkinNo(6);
-				player->userId = 1; // same as StartClient.bat
-				player->setSummoners(SPL_Ignite, SPL_Flash);
-
-				players.push_back(player);
 
 				break;
 

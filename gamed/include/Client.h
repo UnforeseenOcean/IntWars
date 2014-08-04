@@ -37,6 +37,16 @@ struct ClientInfo
 	{
 	}
 
+	void SetPeer(ENetPeer* peer)
+	{
+		this->peer = peer;
+	}
+
+	ENetPeer* GetPeer()
+	{
+		return peer;
+	}
+
 	void setName(const std::string& name)
 	{
 		this->name = name;
@@ -80,6 +90,7 @@ struct ClientInfo
    uint32 summonerSkills[2];
    std::string name, rank;
    uint32 team;
+   ENetPeer* peer;
    
    Champion* champion;
 

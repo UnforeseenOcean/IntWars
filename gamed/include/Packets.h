@@ -441,10 +441,10 @@ struct ChatMessage {
 	uint32 unk1;
 	uint8 unk2;
 
-	uint32 playerNo;
 	ChatType type;
+	uint32 playerNo;	
 	uint32 length;
-	uint8 unk3[32];
+	uint8 unk3[32]; //might be player name?
 	int8 msg;
 
 	int8 *getMessage() {

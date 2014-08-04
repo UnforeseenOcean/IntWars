@@ -44,6 +44,7 @@ bool Game::handleKeyCheck(ENetPeer *peer, ENetPacket *packet) {
 
 	for(ClientInfo* player : players) {
 		if(player->userId == userId) {
+			player->SetPeer(peer);
 			peer->data = player;
 			KeyCheck response;
 			response.userId = keyCheck->userId;
@@ -570,7 +571,15 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
 		break;
 	case CMT_TEAM:
 		//!TODO make a team class and foreach player in the team send the message
-		return sendPacket(peer, packet->data, packet->dataLength, CHL_COMMUNICATION);
+		for(int i=0; i < players.size();i++)
+		{
+			if(players[i]->getTeam() == peerInfo(peer)->getTeam())
+			{
+				if(!sendPacket(players[i]->GetPeer(), packet->data, packet->dataLength, CHL_COMMUNICATION))
+					return false;
+			}
+		}
+		return true;
 		break;
 	default:
 		//Logging->errorLine("Unknown ChatMessageType\n");
