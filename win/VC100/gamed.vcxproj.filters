@@ -163,5 +163,11 @@
     <ClCompile Include="..\..\gamed\src\Projectile.cpp">
       <Filter>logic</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dep\src\raf\FileReader.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\src\raf\RAFFile.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

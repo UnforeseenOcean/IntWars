@@ -50,10 +50,10 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)..\dep\include\glm;$(SolutionDir)..\gamed\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\dep\include\glm;$(SolutionDir)..\gamed\include;$(SolutionDir)..\dep\include\raf;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)..\dep\include\glm;$(SolutionDir)..\gamed\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\dep\include\glm;$(SolutionDir)..\gamed\include;$(SolutionDir)..\dep\include\raf;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -124,6 +124,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\dep\src\raf\FileReader.cpp" />
+    <ClCompile Include="..\..\dep\src\raf\RAFFile.cpp" />
     <ClCompile Include="..\..\gamed\src\ArcaneShift.cpp" />
     <ClCompile Include="..\..\gamed\src\Champion.cpp" />
     <ClCompile Include="..\..\gamed\src\Game.cpp" />

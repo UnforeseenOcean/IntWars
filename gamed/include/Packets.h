@@ -179,15 +179,45 @@ typedef struct _PingLoadInfo {
 
 uint8 *createDynamicPacket(uint8 *str, uint32 size);
 
-typedef struct _LoadScreenInfo {
-	_LoadScreenInfo() {
+class LoadScreenInfo : public Packet {
+public:
+    LoadScreenInfo(const std::vector<ClientInfo*>& players) : Packet(PKT_S2C_LoadScreenInfo) {
 		//Zero this complete buffer
-		memset(this, 0, sizeof(_LoadScreenInfo));
-		cmd = PKT_S2C_LoadScreenInfo;
-		blueMax = redMax = 6;
-	}
+        buffer << (uint32)6; // blueMax
+        buffer << (uint32)6; // redMax
+        
+        uint32 currentBlue = 0;
+        for(ClientInfo* player : players) {
+           if(player->getTeam() == TEAM_BLUE) {
+              buffer << player->userId;
+              currentBlue++;
+           }
+        }
+        
+        for(int i = 0; i < 6-currentBlue; ++i) {
+           buffer << (uint64)0;
+        }
+        
+        buffer.fill(0, 144);
+        
+        uint32 currentPurple = 0;
+        for(ClientInfo* player : players) {
+           if(player->getTeam() == TEAM_PURPLE) {
+              buffer << player->userId;
+              currentPurple++;
+           }
+        }
+        
+        for(int i = 0; i < 6-currentPurple; ++i) {
+           buffer << (uint64)0;
+        }
+        
+        buffer.fill(0, 144);
+        buffer << currentBlue;
+        buffer << currentPurple;
+    }
 
-	uint8 cmd;
+    /*uint8 cmd;
 	uint32 blueMax;
 	uint32 redMax;
 	uint64 bluePlayerIds[6]; //Team 1, 6 players max
@@ -195,8 +225,8 @@ typedef struct _LoadScreenInfo {
 	uint64 redPlayersIds[6]; //Team 2, 6 players max
 	uint8 redData[144];
 	uint32 bluePlayerNo;
-	uint32 redPlayerNo;
-} LoadScreenInfo;
+    uint32 redPlayerNo;*/
+};
 
 typedef struct _KeyCheck {
 	_KeyCheck() {
@@ -508,7 +538,11 @@ public:
 		buffer << (uint32)playerId; // +1 for each player ?
 		buffer << (uint8)0; // netNodeID ?
 		buffer << (uint8)1; // SkillLevel
-		buffer << (uint8)1; // teamIsOrder Blue=Order=1 Purple=Choas=0
+      if(player->getTeam() == TEAM_BLUE) {
+         buffer << (uint8)1; // teamIsOrder Blue=Order=1 Purple=Choas=0
+      } else {
+         buffer << (uint8)0; // teamIsOrder Blue=Order=1 Purple=Choas=0
+      }
 		buffer << (uint8)0; // isBot
 		buffer << (uint8)0; // botRank
 		buffer << (uint8)0; // spawnPosIndex ?
@@ -813,13 +847,13 @@ class CastSpellAns : public GamePacket {
 public:
 	CastSpellAns(Spell* s, float x, float y) : GamePacket(PKT_S2C_CastSpellAns, s->getOwner()->getNetId()) {
 		buffer << (uint8)0 << (uint8)0x66 << (uint8)0x00; // unk
-		buffer << s->getId();
+      buffer << s->getId(); // Spell hash, for example hash("EzrealMysticShot")
 		buffer << (uint32)0x400001f6; // a net ID, but what for..
 		buffer << (uint8)0 << (uint8)0 << (uint8)0;
 		buffer << (uint16)0x3f80; // unk
 		buffer << s->getOwner()->getNetId() << s->getOwner()->getNetId();
+      buffer << (uint32)s->getOwner()->getChampionHash();
 		buffer << (uint32)0x400001f5; // Another net ID..
-		buffer << (uint32)0x9c0cb5a7; // unk
 		buffer << x << 55.f << y;
 		buffer << x << 55.f << y;
 		buffer << (uint8)0;
@@ -871,12 +905,19 @@ public:
 		buffer << (uint64)0x00000000d5002fce; // unk
 		buffer << (uint32)0x7f7fffff; // unk
 		buffer << (uint8)0 << (uint8)0x66 << (uint8)0;
-		buffer << (uint32)0x0BF847F5; // Projectile unique ID ; Right now hardcoded at Mystic Shot
+      buffer << (uint32)0x0a0fe625; // unk
 		buffer << (uint32)0; // Second net ID
 		buffer << (uint8)0; // unk
 		buffer << (uint32)0x3f800000; // unk (1.0f)
 		buffer << p->getOwner()->getNetId() << p->getOwner()->getNetId();
-		buffer << (uint32)0x9c0cb5a7; // unk
+      
+      Champion* c = dynamic_cast<Champion*>(p->getOwner());
+      if(c) {
+         buffer << (uint32)c->getChampionHash();
+      } else {
+         buffer << (uint32)0;
+      }
+      
 		buffer << p->getNetId();
 		buffer << p->getTarget()->x << 150.f << p->getTarget()->y;
 		buffer << p->getTarget()->x << 150.f << p->getTarget()->y;
