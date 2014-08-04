@@ -24,7 +24,6 @@ public:
    virtual ~Map() { }
    virtual void update(long long diff);
    
-   bool Init(ENetPeer *peer);
 
    Object* getObjectById(uint32 id);
    void addObject(Object* o);

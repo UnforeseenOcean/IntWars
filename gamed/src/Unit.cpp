@@ -19,7 +19,7 @@ void Unit::update(int64 diff) {
    if(unitTarget && distance(*unitTarget) <= stats->getRange()) {
       if(autoAttackCooldown <= 0) {
          map->getGame()->notifyAutoAttack(this, unitTarget);
-         Projectile* p = new Projectile(map, GetNewNetID(), x, y, 10, 10, this, unitTarget, 0, getAttackProjectileSpeed());
+         Projectile* p = new Projectile(map, GetNewNetID(), x, y, 10, this, unitTarget, 0, getAttackProjectileSpeed());
          map->addObject(p);
          autoAttackCooldown = 1.f/(stats->getTotalAttackSpeed());
       }
@@ -34,6 +34,12 @@ void Unit::update(int64 diff) {
    
    if(ai) {
       ai->update(diff);
+   }
+   
+   statUpdateTimer += diff;
+   if(statUpdateTimer >= 1000000) { // update stats (hpregen, manaregen) every seconds
+      stats->update(statUpdateTimer);
+      statUpdateTimer = 0;
    }
 }
 

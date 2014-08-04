@@ -40,19 +40,19 @@ bool Game::handleKeyCheck(ENetPeer *peer, ENetPacket *packet) {
 		return false;
 	}
 
-	uint32 playerNo = 0;
+   uint32 playerNo = 0;
 
 	for(ClientInfo* player : players) {
 		if(player->userId == userId) {
 			peer->data = player;
 			KeyCheck response;
 			response.userId = keyCheck->userId;
-			response.playerNo = playerNo;
+         response.playerNo = playerNo;
 			bool bRet = sendPacket(peer, reinterpret_cast<uint8 *>(&response), sizeof(KeyCheck), CHL_HANDSHAKE);
 			handleGameNumber(peer, NULL);//Send 0x91 Packet?
 			return true;
 		}
-		++playerNo;
+      ++playerNo;
 	}
 
 	return false;
@@ -69,27 +69,22 @@ bool Game::handleGameNumber(ENetPeer *peer, ENetPacket *packet) {
 bool Game::handleSynch(ENetPeer *peer, ENetPacket *packet) {
 	SynchVersion *version = reinterpret_cast<SynchVersion *>(packet->data);
 	//Logging->writeLine("Client version: %s\n", version->version);
-	SynchVersionAns answer(players, "Version 4.12.0.356 [PUBLIC]", "CLASSIC");
+    SynchVersionAns answer(players, "Version 4.13.0.262 [PUBLIC]", "CLASSIC");
 	printPacket(reinterpret_cast<uint8 *>(&answer), sizeof(answer));
 	return sendPacket(peer, answer, 3);
 }
 
 bool Game::handleMap(ENetPeer *peer, ENetPacket *packet) {
-	/*LoadScreenPlayerName loadName(*peerInfo(peer));
-	LoadScreenPlayerChampion loadChampion(*peerInfo(peer));
-	//Builds team info
-	LoadScreenInfo screenInfo;
-	screenInfo.bluePlayerNo = 1;
-	screenInfo.redPlayerNo = 0;
-	screenInfo.bluePlayerIds[0] = peerInfo(peer)->userId;
-	bool pInfo = sendPacket(peer, reinterpret_cast<uint8 *>(&screenInfo), sizeof(LoadScreenInfo), CHL_LOADING_SCREEN);
-	//For all players send this info
-	bool pName = sendPacket(peer, loadName, CHL_LOADING_SCREEN);
-	bool pHero = sendPacket(peer, loadChampion, CHL_LOADING_SCREEN);
+	LoadScreenPlayerName loadName(*peerInfo(peer));
+    LoadScreenPlayerChampion loadChampion(*peerInfo(peer));
+    //Builds team info
+    LoadScreenInfo screenInfo(players);
+    bool pInfo = sendPacket(peer, screenInfo, CHL_LOADING_SCREEN);
+    //For all players send this info
+    bool pName = sendPacket(peer, loadName, CHL_LOADING_SCREEN);
+    bool pHero = sendPacket(peer, loadChampion, CHL_LOADING_SCREEN);
 
-	return (pInfo && pName && pHero);*/
-
-	return map->Init(peer);
+    return (pInfo && pName && pHero);
 }
 
 //building the map
@@ -148,10 +143,13 @@ bool Game::handleSpawn(ENetPeer *peer, ENetPacket *packet) {
 }
 
 bool Game::handleStartGame(HANDLE_ARGS) {
-	StatePacket start(PKT_S2C_StartGame);
-	sendPacket(peer, reinterpret_cast<uint8 *>(&start), sizeof(StatePacket), CHL_S2C);
 
-	_started = true;
+   if(++playersReady == players.size()) {
+      StatePacket start(PKT_S2C_StartGame);
+      broadcastPacket(reinterpret_cast<uint8 *>(&start), sizeof(StatePacket), CHL_S2C);
+
+      _started = true;
+   }
 
 	FogUpdate2 test;
 	test.x = 0;
@@ -260,24 +258,18 @@ bool Game::handleMove(ENetPeer *peer, ENetPacket *packet) {
 }
 
 bool Game::handleLoadPing(ENetPeer *peer, ENetPacket *packet) {
-	PingLoadInfo *loadInfo = reinterpret_cast<PingLoadInfo *>(packet->data);
-	PingLoadInfo response;
-	memcpy(&response, packet->data, sizeof(PingLoadInfo));
-	response.header.cmd = PKT_S2C_Ping_Load_Info;
-	response.userId = peerInfo(peer)->userId;
+   PingLoadInfo *loadInfo = reinterpret_cast<PingLoadInfo *>(packet->data);
+   PingLoadInfo response;
+   memcpy(&response, packet->data, sizeof(PingLoadInfo));
+   response.header.cmd = PKT_S2C_Ping_Load_Info;
+   response.userId = peerInfo(peer)->userId;
 	Logging->writeLine("loaded: %f, ping: %f, %f\n", loadInfo->loaded, loadInfo->ping, loadInfo->f3);
-	bool bRet = broadcastPacket(reinterpret_cast<uint8 *>(&response), sizeof(PingLoadInfo), CHL_LOW_PRIORITY, UNRELIABLE);
-	static bool bLoad = false;
-	if(!bLoad) {
-		handleMap(peer, NULL);
-		bLoad = true;
-	}
-	return bRet;
+   return broadcastPacket(reinterpret_cast<uint8 *>(&response), sizeof(PingLoadInfo), CHL_LOW_PRIORITY, UNRELIABLE);
 }
 
 bool Game::handleQueryStatus(HANDLE_ARGS) {
-	QueryStatus response;
-	return sendPacket(peer, reinterpret_cast<uint8 *>(&response), sizeof(QueryStatus), CHL_S2C);
+   QueryStatus response;
+   return sendPacket(peer, reinterpret_cast<uint8 *>(&response), sizeof(QueryStatus), CHL_S2C);
 }
 
 bool Game::handleClick(HANDLE_ARGS) {
