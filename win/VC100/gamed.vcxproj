@@ -69,6 +69,7 @@
       <AdditionalDependencies>ws2_32.lib;Winmm.lib;</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
+      <StackReserveSize>4000000</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -85,6 +86,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dep\include\raf\FileReader.h" />
+    <ClInclude Include="..\..\dep\include\raf\Inibin.h" />
+    <ClInclude Include="..\..\dep\include\raf\MemoryReader.h" />
+    <ClInclude Include="..\..\dep\include\raf\miniz.h" />
+    <ClInclude Include="..\..\dep\include\raf\RAFFile.h" />
+    <ClInclude Include="..\..\dep\include\raf\RAFManager.h" />
+    <ClInclude Include="..\..\dep\include\raf\tinydir.h" />
     <ClInclude Include="..\..\gamed\include\AI\AI.h" />
     <ClInclude Include="..\..\gamed\include\AI\MinionAI.h" />
     <ClInclude Include="..\..\gamed\include\Buffer.h" />
@@ -126,6 +134,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\dep\src\raf\FileReader.cpp" />
     <ClCompile Include="..\..\dep\src\raf\RAFFile.cpp" />
+    <ClCompile Include="..\..\dep\src\raf\RAFManager.cpp" />
     <ClCompile Include="..\..\gamed\src\ArcaneShift.cpp" />
     <ClCompile Include="..\..\gamed\src\Champion.cpp" />
     <ClCompile Include="..\..\gamed\src\Game.cpp" />
@@ -144,6 +153,7 @@
     <ClCompile Include="..\..\gamed\src\Spell.cpp" />
     <ClCompile Include="..\..\gamed\src\Stats.cpp" />
     <ClCompile Include="..\..\gamed\src\SummonersRift.cpp" />
+    <ClCompile Include="..\..\gamed\src\Turret.cpp" />
     <ClCompile Include="..\..\gamed\src\Unit.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

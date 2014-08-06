@@ -18,28 +18,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "stdafx.h"
 #include "Game.h"
-#include "RAFFile.h"
+#include "RAFManager.h"
 #include "Inibin.h"
 
 #define SERVER_HOST ENET_HOST_ANY 
 #define SERVER_PORT 5119
 #define SERVER_KEY "17BLOhi6KZsTtldTsizvHg=="
 
-#define SERVER_VERSION "0.0.3"
+#define SERVER_VERSION "0.1.0"
 
 int main(int argc, char ** argv) 
 {
-   /*RAFFile raf("Archive_2.raf");
-   std::vector<unsigned char> testFile;
-   
-   raf.readFile("DATA/Characters/Yasuo/Yasuo.inibin", testFile);
-   
-   printf("size : %d\n", testFile.size());
-   printf("%s\n", &testFile[0]);
-   
-   Inibin yasuo(testFile);*/
+   Logging->writeLine("IntWars %s\n",SERVER_VERSION);
+   //printf("Yorick %s\n", SERVER_VERSION);
+   Logging->writeLine("Loading RAF files in filearchives/ ..\n");
 
-	Logging->writeLine("IntWars %s\n",SERVER_VERSION);
+   std::string basePath = RAFManager::getInstance()->findGameBasePath();
+   if(!RAFManager::getInstance()->init(basePath + "filearchives")) {
+      Logging->errorLine("Couldn't load RAF files. Make sure you have League of Legends installed correctly or 'filearchives' directory in the server's root directory\n");
+      Logging->errorLine("This directory is to be taken from RADS/projects/lol_game_client/\n");
+      return EXIT_FAILURE;
+   }
+
+
 	Game g;
 	ENetAddress address;
 	address.host = SERVER_HOST;
@@ -57,4 +58,5 @@ int main(int argc, char ** argv)
 
 
 	
+   return EXIT_SUCCESS;
 }

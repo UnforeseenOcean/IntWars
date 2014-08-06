@@ -24,7 +24,7 @@ RAFFile::RAFFile(const std::string& filename) : rafHeaderFile(filename), rafData
       uint32 hash;
       
       rafHeaderFile >> hash >> entry;
-      //printf("Hash : %08X ; Offset : %08X ; Size : %08X ; Index : %08x\n", hash, entry.offset, entry.size, entry.fileNameStringTableIndex);
+      // printf("Hash : %08X ; Offset : %08X ; Size : %08X ; Index : %08x\n", hash, entry.offset, entry.size, entry.fileNameStringTableIndex);
       fileEntries[hash] = entry;
    }   
 }
@@ -48,7 +48,6 @@ bool RAFFile::readFile(const std::string& path, vector<unsigned char>& toFill) {
    map<uint32, FileEntry>::iterator entry = fileEntries.find(hash);
    
    if(entry == fileEntries.end()) {
-      printf("Couldn't find file with hash %08X !\n", hash);
       return false;
    }
    

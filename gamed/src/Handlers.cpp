@@ -570,7 +570,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
 		return broadcastPacket(packet->data, packet->dataLength, CHL_COMMUNICATION);
 		break;
 	case CMT_TEAM:
-		//!TODO make a team class and foreach player in the team send the message
+		
 		for(int i=0; i < players.size();i++)
 		{
 			if(players[i]->getTeam() == peerInfo(peer)->getTeam())

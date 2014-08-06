@@ -1,12 +1,32 @@
 #include "stdafx.h"
 #include "Champion.h"
+#include "RAFManager.h"
+#include "Inibin.h"
 
 Champion::Champion(const std::string& type, Map* map, uint32 id) : Unit(map, id, new Stats()), type(type), skillPoints(1), level(1)  
 {
-   stats->setCurrentHealth(666.0f);
-   stats->setMaxHealth(1337.0f);
    stats->setGold(475.0f);
    stats->setAttackSpeedMultiplier(1.0f);
+
+   std::vector<unsigned char> iniFile;
+   if(!RAFManager::getInstance()->readFile("DATA/Characters/"+type+"/"+type+".inibin", iniFile)) {
+      printf("ERR : couldn't find champion stats for %s\n", type.c_str());
+      return;
+   }
+   
+   Inibin inibin(iniFile);
+
+   stats->setCurrentHealth(atoi(inibin.getStringValue("Data", "BaseHP").c_str())); // Why rito ? why maxHP as a string and mana as a float ?
+   stats->setMaxHealth(atoi(inibin.getStringValue("Data", "BaseHP").c_str()));
+   stats->setCurrentMana(inibin.getFloatValue("Data", "BaseMP"));
+   stats->setMaxMana(inibin.getFloatValue("Data", "BaseMP"));
+   stats->setBaseAd(inibin.getFloatValue("DATA", "BaseDamage"));
+   stats->setRange(atoi(inibin.getStringValue("DATA", "AttackRange").c_str()));
+   stats->setMovementSpeed(inibin.getFloatValue("DATA", "MoveSpeed"));
+   stats->setArmor(inibin.getFloatValue("DATA", "Armor"));
+   stats->setMagicArmor(inibin.getFloatValue("DATA", "SpellBlock"));
+   stats->setHp5(inibin.getFloatValue("DATA", "BaseStaticHPRegen"));
+   stats->setMp5(inibin.getFloatValue("DATA", "BaseStaticMPRegen"));
 }
 
 Spell* Champion::castSpell(uint8 slot, float x, float y, Unit* target) {

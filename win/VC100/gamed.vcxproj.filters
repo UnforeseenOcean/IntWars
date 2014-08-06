@@ -25,6 +25,9 @@
     <Filter Include="logic\Characters\Champions\Ezreal">
       <UniqueIdentifier>{760326d6-8ed6-4575-a67d-49986eabf26a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Common\RAF">
+      <UniqueIdentifier>{0fc0e0d3-5885-4fdd-88ac-8d15e8648ccf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\gamed\include\AI\MinionAI.h">
@@ -106,6 +109,27 @@
     <ClInclude Include="..\..\gamed\include\Log.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dep\include\raf\FileReader.h">
+      <Filter>Common\RAF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\include\raf\Inibin.h">
+      <Filter>Common\RAF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\include\raf\MemoryReader.h">
+      <Filter>Common\RAF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\include\raf\miniz.h">
+      <Filter>Common\RAF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\include\raf\RAFFile.h">
+      <Filter>Common\RAF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\include\raf\RAFManager.h">
+      <Filter>Common\RAF</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\include\raf\tinydir.h">
+      <Filter>Common\RAF</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\gamed\src\main.cpp" />
@@ -163,11 +187,17 @@
     <ClCompile Include="..\..\gamed\src\Projectile.cpp">
       <Filter>logic</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dep\src\raf\FileReader.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dep\src\raf\RAFFile.cpp">
-      <Filter>Common</Filter>
+      <Filter>Common\RAF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\src\raf\FileReader.cpp">
+      <Filter>Common\RAF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\src\raf\RAFManager.cpp">
+      <Filter>Common\RAF</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Turret.cpp">
+      <Filter>logic</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
