@@ -20,10 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-
+#include <sstream>
 #include "stdafx.h"
 #include "Game.h"
+#include "LuaScript.h"
 #include "SummonersRift.h"
+
+
+
+
 
 #define REFRESH_RATE 5
 
@@ -47,8 +52,38 @@ Game::~Game()
 	enet_host_destroy(_server);
 }
 
-bool Game::initialize(ENetAddress *address, const char *baseKey)
+uint32 Game::strToId(std::string str){
+    if(str == "FLASH"){
+        return SPL_Flash;
+    }else if(str == "IGNITE"){
+        return SPL_Ignite;
+    }else if(str == "HEAL"){
+        return SPL_Heal;
+    }else if(str == "BARRIER"){
+        return SPL_Barrier;  
+    }else if(str == "SMITE"){
+        return SPL_Smite;
+    }else if(str == "GHOST"){
+        return SPL_Ghost;
+    }else if(str == "REVIVE"){
+        return SPL_Revive;
+    }else if(str == "CLEANSE"){
+        return SPL_Cleanse;
+    }else if(str == "TELEPORT"){
+        return SPL_Teleport;
+    }
+    
+}
+
+template<typename T>
+std::string toString(const T& value)
 {
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+}
+
+bool Game::initialize(ENetAddress *address, const char *baseKey){
 	if (enet_initialize () != 0)
 		return false;
 	atexit(enet_deinitialize);
@@ -64,28 +99,76 @@ bool Game::initialize(ENetAddress *address, const char *baseKey)
 	_blowfish = new BlowFish((uint8*)key.c_str(), 16);
 	initHandlers();
    
+   
+   printf("Before map");
 	map = new SummonersRift(this);
    
+   //TODO: better lua implementation
+   
+   LuaScript script;
+   
+   script.loadScript("../../lua/config.lua");
+   
+  //  sol::state lua;
+  //  lua.open_libraries(sol::lib::base, sol::lib::table);
+    
+  //  lua.open_file("../../lua/config.lua");
+    sol::table playerList = script.getTable("players");
+    for(int i=1;i<12;i++){
+        try{
+        std::string playerIndex = "player"+toString(i);
+        
+    sol::table player1 = playerList.get<sol::table>(playerIndex);
+    
+    std::string rank = player1.get<std::string>("rank");
+    std::string name = player1.get<std::string>("name");
+    std::string champion = player1.get<std::string>("champion");
+    std::string team = player1.get<std::string>("team");
+    int skin = player1.get<int>("skin");
+    int ribbon = player1.get<int>("ribbon");
+    std::string summoner1 = player1.get<std::string>("summoner1");
+    std::string summoner2 = player1.get<std::string>("summoner2");
+    
+    
+       ClientInfo* player;
+    
+    if(team == "BLUE"){
+        player = new ClientInfo(rank, TEAM_BLUE, ribbon);
+    }else {
+        player = new ClientInfo(rank, TEAM_PURPLE, ribbon);
+    }
 
-	ClientInfo* player = 0;
-	Champion* c = 0;
+
+   
 	// TODO : put the following in a config file !
-	player = new ClientInfo("GOLD", TEAM_PURPLE);
+ 
+   player->setName(name);
+   
+   
+   
+   Champion* c = ChampionFactory::getChampionFromType(champion, map, GetNewNetID());
 
-
-	std::stringstream ss;
-	ss.str("");
-	ss << "Player" << (players.size()+1);
-	player->setName(ss.str());
-	c = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
-	c->setPosition(35.90f, 273.55f);
+   c->setPosition(35.90f, 273.55f);
+   
 	map->addObject(c);
+   
+   player->setSkinNo(skin);
 	player->setChampion(c);
-	player->setSkinNo(6);
-	player->userId = 1; // same as StartClient.bat
-	player->setSummoners(SPL_Ignite, SPL_Flash);
+   static int id = 1;
+   player->userId = id; // same as StartClient.bat
+   id++;
+   player->setSummoners(strToId(summoner1), strToId(summoner2));
+   
+   
 
 	players.push_back(player);
+   
+                }catch(sol::error e){
+                    //printf("Error loading champion: \n%s", e.what());
+          break;  
+        }
+    }
+    
 
    
 	 //Uncomment the following to get 2-players

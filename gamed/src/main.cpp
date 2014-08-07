@@ -32,22 +32,23 @@ int main(int argc, char ** argv)
    Logging->writeLine("IntWars %s\n",SERVER_VERSION);
    //printf("Yorick %s\n", SERVER_VERSION);
    Logging->writeLine("Loading RAF files in filearchives/ ..\n");
-
+   
    std::string basePath = RAFManager::getInstance()->findGameBasePath();
    if(!RAFManager::getInstance()->init(basePath + "filearchives")) {
       Logging->errorLine("Couldn't load RAF files. Make sure you have League of Legends installed correctly or 'filearchives' directory in the server's root directory\n");
       Logging->errorLine("This directory is to be taken from RADS/projects/lol_game_client/\n");
       return EXIT_FAILURE;
    }
+   
 
 
 	Game g;
 	ENetAddress address;
 	address.host = SERVER_HOST;
 	address.port = SERVER_PORT;
-	
+   
+   
 
-	Logging->writeLine("Initializing Game Session\n");
 	if(!g.initialize(&address, SERVER_KEY))
 	{
 		Logging->writeLine("Failed to initialize game!");
@@ -55,7 +56,7 @@ int main(int argc, char ** argv)
 	}
 
 	g.netLoop();
-
+   
 
 	
    return EXIT_SUCCESS;

@@ -10,7 +10,7 @@
 enum FieldMaskOne : uint32
 {
    FM1_Gold        = 0x00000001,
-   FM1_Gold_2      = 0x00000002,
+   FM1_Gold_Total  = 0x00000002,
    FM1_SPELL       = 0x00000004 // Sending short 0x108[1248] activates spells 1/2/3/4
 };
 
@@ -49,6 +49,7 @@ enum FieldMaskFour : uint32
    FM4_Vision2     = 0x00000200,
    FM4_Speed       = 0x00000400,
    FM4_ModelSize   = 0x00000800,
+   FM4_Level       = 0x00002000 //not sure how to edit this, but it is level as setting it to any value changes level to 0
 };
 
 enum FieldMaskFive : uint32
@@ -62,6 +63,10 @@ protected:
    std::multimap<uint8, uint32> updatedStats;
    bool updatedHealth;
    
+   // Here all the stats that don't have a bitmask
+   float goldPer5;
+   float adPerLevel, armorPerLevel, magicArmorPerLevel;
+   
 public:
 
    Stats() : updatedHealth(false) { }
@@ -74,6 +79,8 @@ public:
    
    bool isUpdatedHealth() const { return updatedHealth; }
    void clearUpdatedHealth() { updatedHealth = false; }
+   
+   virtual bool isFloat(uint8 blockId, uint32 stat);
 
    virtual float getBaseAd() const {
       return getStat(MM_Two, FM2_Base_Ad);
@@ -81,6 +88,10 @@ public:
    
    virtual float getBonusAdFlat() const {
       return getStat(MM_Two, FM2_Bonus_Ad_Flat);
+   }
+   
+   virtual float getBonusApFlat() const {
+     return getStat(MM_Two, FM2_Bonus_Ap_Flat);
    }
    
    virtual float getBonusAdPct() const {
@@ -143,18 +154,33 @@ public:
       return getStat(MM_Two, FM2_Atks_multiplier);
    }
    
-      
    virtual float getGold(){
-       return getStat(MM_One, FM1_Gold);
-       
+      return getStat(MM_One, FM1_Gold);
    }
-
+   
+   virtual float getGoldPer5(){
+      return goldPer5;    
+   }
+   
+   
+   virtual void setCritChance(float crit) {
+      return setStat(MM_Two, FM2_Crit_Chance, crit);
+   }
+   
    virtual void setBaseAd(float ad) {
       setStat(MM_Two, FM2_Base_Ad, ad);
    }
    
    virtual void setRange(float range) {
       setStat(MM_Two, FM2_Range, range);
+   }
+   
+   virtual void setBonusAdFlat(float ad) {
+      setStat(MM_Two, FM2_Bonus_Ad_Flat, ad);
+   }
+   
+   virtual void setBonusApFlat(float ap) {
+      setStat(MM_Two, FM2_Bonus_Ap_Flat, ap);
    }
    
    virtual void setArmor(float armor) {
@@ -199,8 +225,8 @@ public:
       setStat(MM_One, FM1_Gold, gold);
    }
    
-     virtual void setGoldPer5(float gold) {
-      setStat(MM_One, FM1_Gold_2, gold);
+   virtual void setGoldPer5(float gold) {
+      goldPer5 = gold;
    }
 
    virtual void setBaseAp(float AP) {
@@ -209,6 +235,10 @@ public:
 
    virtual void setExp(float EXP) {
 	  setStat(MM_Four, FM4_exp, EXP);
+   }
+   
+   virtual void setLevel(float level) {
+	  setStat(MM_Four, FM4_Level, level);
    }
 
    virtual void setSize(float Size) {

@@ -3,7 +3,9 @@
 
 #include "stdafx.h"
 #include "Projectile.h"
+#include "RAFFile.h"
 #include <vector>
+#include "LuaScript.h"
 
 
 class Unit;
@@ -15,19 +17,32 @@ enum SpellState {
    STATE_COOLDOWN
 };
 
+
+
 class Spell {
 protected:
-   uint32 id;
    Champion* owner;
    uint8 level;
    uint8 slot;
-   SpellState state;
+   std::string spellName;
    
+  LuaScript script;
 
    float castTime;
+   float castRange;
+   float projectileSpeed;
    float cooldown[5];
    float cost[5];
    
+   // Warning : this value usually contains one of the "ad/ap" bonus coefficient, as seen in "deals 50 (+{coefficient}%) damage"
+   // However, it may not be accurate and there's no way to tell whether it's the ad or ap bonus for hybrid spells
+   // Sometimes, it is also stored as an effect value instead of the coefficient
+   float coefficient;
+   std::vector< std::vector<float> > effects;
+   
+   float range = 0;
+   
+   SpellState state;
    float currentCooldown;
    float currentCastTime;
    
@@ -35,7 +50,9 @@ protected:
    float x, y;
    
 public:
-   Spell(uint32 id, Champion* owner, float castTime, uint8 slot) : id(id), owner(owner), level(0), slot(slot), state(STATE_READY), castTime(castTime), currentCooldown(0), currentCastTime(0) { }
+   Spell(Champion* owner, const std::string& spellName, uint8 slot);
+   
+   
    
    /**
     * Called when the character casts the spell
@@ -48,8 +65,6 @@ public:
     */
    virtual void finishCasting();
    
-
-   
    /**
     * Called every diff milliseconds to update the spell
     */
@@ -59,15 +74,28 @@ public:
     * Called by projectiles when they land / hit
     * In here we apply the effects : damage, buffs, debuffs...
     */
-   virtual void applyEffects(Target* t, Projectile* p = 0) = 0;
+   virtual void applyEffects(Target* t, Projectile* p = 0);
    
    Champion* getOwner() const { return owner; }
    
    /**
     * @return Spell's unique ID
     */
-   uint32 getId() const { return id; }
+   uint32 getId() const;
    float getCastTime() const { return castTime; }
+   
+   std::string getStringForSlot();
+   
+   /*
+    * does spell effects in lua if defined.
+    */
+   void doLua();
+   void loadLua();
+   void reloadLua();
+   
+   void setSlot(int _slot){
+       slot=_slot;
+   }
    
    /**
     * TODO : Add in CDR % from champion's stat

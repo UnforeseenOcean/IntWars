@@ -37,6 +37,7 @@ public:
    uint32 getChampionHash();
    
    uint8 getSkillPoints() const { return skillPoints; }
+   
 
 };
 

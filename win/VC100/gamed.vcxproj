@@ -58,7 +58,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\dep\include; ..\..\;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\dep\include; ..\..\;..\..\dep\include\sol;..\..\dep\include\lua</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -75,7 +75,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>..\..\dep\include; ..\..\;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\dep\include; ..\..\;..\..\dep\include\sol;..\..\dep\include\lua</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;</PreprocessorDefinitions>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -130,12 +130,14 @@
       <Project>{253d40b4-8b15-44d1-a718-c4035a31e5de}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="Lua.vcxproj">
+      <Project>{b4e4c4cb-25fd-4dbf-a743-2976e9081a56}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dep\src\raf\FileReader.cpp" />
     <ClCompile Include="..\..\dep\src\raf\RAFFile.cpp" />
     <ClCompile Include="..\..\dep\src\raf\RAFManager.cpp" />
-    <ClCompile Include="..\..\gamed\src\ArcaneShift.cpp" />
     <ClCompile Include="..\..\gamed\src\Champion.cpp" />
     <ClCompile Include="..\..\gamed\src\Game.cpp" />
     <ClCompile Include="..\..\gamed\src\Handlers.cpp" />
@@ -145,7 +147,6 @@
     <ClCompile Include="..\..\gamed\src\main.cpp" />
     <ClCompile Include="..\..\gamed\src\Map.cpp" />
     <ClCompile Include="..\..\gamed\src\Minion.cpp" />
-    <ClCompile Include="..\..\gamed\src\MysticShot.cpp" />
     <ClCompile Include="..\..\gamed\src\Notifiers.cpp" />
     <ClCompile Include="..\..\gamed\src\Object.cpp" />
     <ClCompile Include="..\..\gamed\src\PacketHandler.cpp" />

@@ -44,6 +44,8 @@ class Game
 	public:
 		Game();
 		~Game();
+                
+                uint32 strToId(std::string str);
 
 		bool initialize(ENetAddress *address, const char *baseKey);
 		void netLoop();
@@ -79,7 +81,7 @@ class Game
 		void notifyUpdatedStats(Unit* u);
 		void notifyMovement(Object* o);
 		void notifyDamageDone(Unit* source, Unit* target, float amount);
-		void notifyAutoAttack(Unit* attacker, Unit* victim);
+      void notifyAutoAttack(Unit* attacker, Unit* victim, uint32 futureProjNetId);
 		void notifyTeleport(Unit* u);
 		void notifyProjectileSpawn(Projectile* p);
 

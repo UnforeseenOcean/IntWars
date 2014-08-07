@@ -19,13 +19,10 @@
     <Filter Include="Common">
       <UniqueIdentifier>{48aff62c-a0f5-4fac-9c1b-bfaf52ac6e24}</UniqueIdentifier>
     </Filter>
-    <Filter Include="logic\Characters\Champions">
-      <UniqueIdentifier>{0bddbd72-d721-4f9d-9178-2b463c452291}</UniqueIdentifier>
+    <Filter Include="ExtLib">
+      <UniqueIdentifier>{599dd4ae-c7be-4b08-9bc3-5adc3161d2d4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="logic\Characters\Champions\Ezreal">
-      <UniqueIdentifier>{760326d6-8ed6-4575-a67d-49986eabf26a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Common\RAF">
+    <Filter Include="ExtLib\RAF">
       <UniqueIdentifier>{0fc0e0d3-5885-4fdd-88ac-8d15e8648ccf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -110,25 +107,25 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\include\raf\FileReader.h">
-      <Filter>Common\RAF</Filter>
+      <Filter>ExtLib\RAF</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\include\raf\Inibin.h">
-      <Filter>Common\RAF</Filter>
+      <Filter>ExtLib\RAF</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\include\raf\MemoryReader.h">
-      <Filter>Common\RAF</Filter>
+      <Filter>ExtLib\RAF</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\include\raf\miniz.h">
-      <Filter>Common\RAF</Filter>
+      <Filter>ExtLib\RAF</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\include\raf\RAFFile.h">
-      <Filter>Common\RAF</Filter>
+      <Filter>ExtLib\RAF</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\include\raf\RAFManager.h">
-      <Filter>Common\RAF</Filter>
+      <Filter>ExtLib\RAF</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\include\raf\tinydir.h">
-      <Filter>Common\RAF</Filter>
+      <Filter>ExtLib\RAF</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -160,12 +157,6 @@
     <ClCompile Include="..\..\gamed\src\Stats.cpp">
       <Filter>logic</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gamed\src\MysticShot.cpp">
-      <Filter>logic\Characters\Champions\Ezreal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\src\ArcaneShift.cpp">
-      <Filter>logic\Characters\Champions\Ezreal</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\gamed\src\PacketHandler.cpp">
       <Filter>Protocol</Filter>
     </ClCompile>
@@ -188,13 +179,13 @@
       <Filter>logic</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dep\src\raf\RAFFile.cpp">
-      <Filter>Common\RAF</Filter>
+      <Filter>ExtLib\RAF</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dep\src\raf\FileReader.cpp">
-      <Filter>Common\RAF</Filter>
+      <Filter>ExtLib\RAF</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dep\src\raf\RAFManager.cpp">
-      <Filter>Common\RAF</Filter>
+      <Filter>ExtLib\RAF</Filter>
     </ClCompile>
     <ClCompile Include="..\..\gamed\src\Turret.cpp">
       <Filter>logic</Filter>

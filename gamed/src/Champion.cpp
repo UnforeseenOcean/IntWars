@@ -16,17 +16,37 @@ Champion::Champion(const std::string& type, Map* map, uint32 id) : Unit(map, id,
    
    Inibin inibin(iniFile);
 
-   stats->setCurrentHealth(atoi(inibin.getStringValue("Data", "BaseHP").c_str())); // Why rito ? why maxHP as a string and mana as a float ?
-   stats->setMaxHealth(atoi(inibin.getStringValue("Data", "BaseHP").c_str()));
+   printf("Loading champion type %s", type.c_str());
+   
+   stats->setCurrentHealth(inibin.getFloatValue("Data", "BaseHP")); // Why rito ? why maxHP as a string and mana as a float ?
+   stats->setMaxHealth(inibin.getFloatValue("Data", "BaseHP"));
    stats->setCurrentMana(inibin.getFloatValue("Data", "BaseMP"));
    stats->setMaxMana(inibin.getFloatValue("Data", "BaseMP"));
    stats->setBaseAd(inibin.getFloatValue("DATA", "BaseDamage"));
-   stats->setRange(atoi(inibin.getStringValue("DATA", "AttackRange").c_str()));
+   stats->setRange(inibin.getFloatValue("DATA", "AttackRange"));
    stats->setMovementSpeed(inibin.getFloatValue("DATA", "MoveSpeed"));
    stats->setArmor(inibin.getFloatValue("DATA", "Armor"));
    stats->setMagicArmor(inibin.getFloatValue("DATA", "SpellBlock"));
    stats->setHp5(inibin.getFloatValue("DATA", "BaseStaticHPRegen"));
    stats->setMp5(inibin.getFloatValue("DATA", "BaseStaticMPRegen"));
+   
+   spells.push_back(new Spell(this, inibin.getStringValue("Data", "Spell1"), 0));
+   spells.push_back(new Spell(this, inibin.getStringValue("Data", "Spell2"), 1));
+   spells.push_back(new Spell(this, inibin.getStringValue("Data", "Spell3"), 2));
+   spells.push_back(new Spell(this, inibin.getStringValue("Data", "Spell4"), 3));
+   
+   iniFile.clear();
+   if(!RAFManager::getInstance()->readFile("DATA/Characters/"+type+"/Spells/"+type+"BasicAttack.inibin", iniFile)) {
+      if(!RAFManager::getInstance()->readFile("DATA/Spells/"+type+"BasicAttack.inibin", iniFile)) {
+         printf("ERR : couldn't find champion auto-attack data for %s\n", type.c_str());
+         return;
+      }
+   }
+   
+   Inibin autoAttack(iniFile);
+   
+   autoAttackDelay = autoAttack.getFloatValue("SpellData", "castFrame")/30.f;
+   autoAttackProjectileSpeed = autoAttack.getFloatValue("SpellData", "MissileSpeed")/30.f;
 }
 
 Spell* Champion::castSpell(uint8 slot, float x, float y, Unit* target) {
@@ -35,6 +55,8 @@ Spell* Champion::castSpell(uint8 slot, float x, float y, Unit* target) {
    }
    
    Spell* s = spells[slot];
+   
+   s->setSlot(slot);//temporary hack until we redo spells to be almost fully lua-based
    
    if(s->getCost() > stats->getCurrentMana() || s->getState() != STATE_READY) {
       return 0;

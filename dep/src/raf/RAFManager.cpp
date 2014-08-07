@@ -9,6 +9,10 @@
 #pragma comment(lib, "Advapi32.lib")
 #endif
 
+#ifdef _WIN32
+#include <windows.h>
+#include<Winreg.h>
+#endif
 using namespace std;
 
 RAFManager* RAFManager::instance = 0;
@@ -28,16 +32,29 @@ bool RAFManager::init(const string& rootDirectory) {
       if (!file.is_dir || strcmp(file.name, ".") == 0 || strcmp(file.name, "..") == 0) {
          continue;
       }
+
+      tinydir_dir subDir;
+      tinydir_open_sorted(&subDir, (rootDirectory + '/' + file.name).c_str());
       
-      printf("%s\n", file.name);
+      for (int j = 0; j < subDir.n_files; j++)
+      {
+         tinydir_file subFile;
+         tinydir_readfile_n(&subDir, &subFile, j);
       
-      string rafPath = rootDirectory + '/' + file.name + "/Archive_2.raf";
-      RAFFile* raf = new RAFFile(rafPath);
+         string filename(subFile.name);
+         string check = ".raf";
+         
+         if(filename.length() >= 5 && filename.find(check) && filename[filename.length()-1] == 'f') {
+            string rafPath = rootDirectory + '/' + file.name + '/' + filename;
+            RAFFile* raf = new RAFFile(rafPath);
+            files.push_back(raf);
+         }
+      }
       
-      files.push_back(raf);
+      tinydir_close(&subDir);
    }
    
-   printf("Loaded %d RAF files\n", files.size());
+   printf("Loaded %lu RAF files\n", files.size());
 
    tinydir_close(&dir);
    
@@ -64,7 +81,6 @@ std::string RAFManager::findGameBasePath()
 	strKeyPathCU.push_back("SOFTWARE\\RIOT GAMES\\RADS");
 	strKeyPathCU.push_back("SOFTWARE\\Classes\\VirtualStore\\MACHINE\\SOFTWARE\\Wow6432Node\\RIOT GAMES\\RADS");
 	strKeyPathCU.push_back("SOFTWARE\\Classes\\VirtualStore\\MACHINE\\SOFTWARE\\RIOT GAMES\\RADS");
-	strKeyPathCU.push_back("SOFTWARE\\Classes\\VirtualStore\\MACHINE\\SOFTWARE\\RIOT GAMES\\RADS");
 	strKeyPathCU.push_back("SOFTWARE\\RIOT GAMES\\RADS");
 
 	strKeyPathLM.push_back("Software\\Wow6432Node\\Riot Games\\RADS");
@@ -74,6 +90,7 @@ std::string RAFManager::findGameBasePath()
 	DWORD dwValueType;
 	TCHAR byteValue[100];
 	DWORD dwValueSize;
+
 
 
 	//Check CURRENT_USER keys

@@ -125,7 +125,8 @@ public:
 			buffer.fill(0, 64-p->getName().length());
 			buffer.fill(0, 64);
 			buffer << p->getRank();
-			buffer.fill(0, 30-p->getRank().length());
+         buffer.fill(0, 28-p->getRank().length());
+         buffer << (uint16)p->getRibbon();
 		}
 
 		for(int i = 0; i < 12-players.size(); ++i) {
@@ -775,12 +776,13 @@ public:
 
 class AutoAttack : public BasePacket {
 public:
-	AutoAttack(Unit* attacker, Unit* attacked) : BasePacket(PKT_S2C_AutoAttack, attacker->getNetId()) {
+   AutoAttack(Unit* attacker, Unit* attacked, uint32 futureProjNetId) : BasePacket(PKT_S2C_AutoAttack, attacker->getNetId()) {
 		buffer << attacked->getNetId();
-		buffer << (uint16)0xd580; // unk
-		buffer << 12.f; // unk
-		buffer << attacker->x << attacker->y;
-	}
+      buffer << (uint8)0x80; // unk
+      buffer << futureProjNetId; // Basic attack projectile ID, to be spawned later
+      buffer << (uint8)0x40; // unk
+      buffer << attacker->getX() << attacker->getY();
+   }
 };
 
 class SetTarget : public BasePacket {
@@ -846,6 +848,7 @@ struct CastSpell {
 class CastSpellAns : public GamePacket {
 public:
 	CastSpellAns(Spell* s, float x, float y) : GamePacket(PKT_S2C_CastSpellAns, s->getOwner()->getNetId()) {
+      printf("%08X ; %08X ; %f\n", s->getId(), s->getOwner()->getChampionHash(), s->getCastTime());
 		buffer << (uint8)0 << (uint8)0x66 << (uint8)0x00; // unk
       buffer << s->getId(); // Spell hash, for example hash("EzrealMysticShot")
 		buffer << (uint32)0x400001f6; // a net ID, but what for..
@@ -905,7 +908,7 @@ public:
 		buffer << (uint64)0x00000000d5002fce; // unk
 		buffer << (uint32)0x7f7fffff; // unk
 		buffer << (uint8)0 << (uint8)0x66 << (uint8)0;
-      buffer << (uint32)0x0a0fe625; // unk
+      buffer << (uint32)p->getProjectileId(); // unk (projectile ID)
 		buffer << (uint32)0; // Second net ID
 		buffer << (uint8)0; // unk
 		buffer << (uint32)0x3f800000; // unk (1.0f)
@@ -954,18 +957,30 @@ public:
 
 		for(uint8 m : masks) {
 			uint32 mask = 0;
+         uint8 size = 0;
 
 			for(auto it = stats.lower_bound(m); it != stats.upper_bound(m); ++it) {
+            if(u->getStats().isFloat(m, it->second)) {
+               size += 4;
+            } else {
+               size += 2;
+            }
+            
 				mask |= it->second;
 			}
 
 			buffer << mask;
-			buffer << (uint8)(stats.count(m)*4);
+         buffer << size;
 
 			for(int i = 0; i < 32; ++i) {
 				uint32 tmpMask = (1 << i);
 				if(tmpMask & mask) {
-					buffer << u->getStats().getStat(m, tmpMask);
+               if(u->getStats().isFloat(m, tmpMask)) {
+                  buffer << u->getStats().getStat(m, tmpMask);
+               } else {
+                  uint16 stat = floor(u->getStats().getStat(m, tmpMask) + 0.5);
+                  buffer << stat;
+               }
 				}
 			}
 		}

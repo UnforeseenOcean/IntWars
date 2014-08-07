@@ -16,13 +16,14 @@ public:
    }
    
    bool init(const std::string& rootDirectory);
-   bool readFile(const std::string& path, std::vector<unsigned char>& toFill);
    std::string findGameBasePath();
+   bool readFile(const std::string& path, std::vector<unsigned char>& toFill);
 
 private:
    RAFManager() { }
    std::vector<RAFFile*> files;
    static RAFManager* instance;
+
 
 };
 
