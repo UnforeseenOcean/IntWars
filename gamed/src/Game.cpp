@@ -26,10 +26,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "LuaScript.h"
 #include "SummonersRift.h"
 
-
-
-
-
 #define REFRESH_RATE 5
 
 using namespace std;
@@ -83,21 +79,22 @@ std::string toString(const T& value)
     return oss.str();
 }
 
-bool Game::initialize(ENetAddress *address, const char *baseKey){
-	if (enet_initialize () != 0)
-		return false;
-	atexit(enet_deinitialize);
+bool Game::initialize(ENetAddress *address, const char *baseKey)
+{
+    if (enet_initialize () != 0)
+        return false;
+    atexit(enet_deinitialize);
 
-	_server = enet_host_create(address, 32, 0, 0);
-	if(_server == NULL)
-		return false;
+    _server = enet_host_create(address, 32, 0, 0);
+    if(_server == NULL)
+        return false;
 
-	string key = base64_decode(baseKey);
-	if(key.length() <= 0)
-		return false;
-      
-	_blowfish = new BlowFish((uint8*)key.c_str(), 16);
-	initHandlers();
+    std::string key = base64_decode(baseKey);
+    if(key.length() <= 0)
+        return false;
+
+    _blowfish = new BlowFish((uint8*)key.c_str(), 16);
+    initHandlers();
    
    
    printf("Before map");
@@ -120,55 +117,44 @@ bool Game::initialize(ENetAddress *address, const char *baseKey){
 		{
 			std::string playerIndex = "player"+toString(i);
         
-			sol::table player1 = playerList.get<sol::table>(playerIndex);
-    
-			std::string rank = player1.get<std::string>("rank");
-			std::string name = player1.get<std::string>("name");
-			std::string champion = player1.get<std::string>("champion");
-			std::string team = player1.get<std::string>("team");
-			int skin = player1.get<int>("skin");
-			int ribbon = player1.get<int>("ribbon");
-			std::string summoner1 = player1.get<std::string>("summoner1");
-			std::string summoner2 = player1.get<std::string>("summoner2");
-    
-    
-			   ClientInfo* player;
-    
-			if(team == "BLUE"){
-				player = new ClientInfo(rank, TEAM_BLUE, ribbon);
-			}else {
-				player = new ClientInfo(rank, TEAM_PURPLE, ribbon);
-			}
+            sol::table playerData = playerList.get<sol::table>(playerIndex);
+
+            std::string rank = playerData.get<std::string>("rank");
+            std::string name = playerData.get<std::string>("name");
+            std::string champion = playerData.get<std::string>("champion");
+            std::string team = playerData.get<std::string>("team");
+            int skin = playerData.get<int>("skin");
+            int ribbon = playerData.get<int>("ribbon");
+            std::string summoner1 = playerData.get<std::string>("summoner1");
+            std::string summoner2 = playerData.get<std::string>("summoner2");
+
+            ClientInfo* player = new ClientInfo(rank, ((team == "BLUE") ? TEAM_BLUE : TEAM_PURPLE), ribbon);
+
+           player->setName(name);
 
 
-   
-			// TODO : put the following in a config file !
- 
-			player->setName(name);
-   
-   
-   
-			Champion* c = ChampionFactory::getChampionFromType(champion, map, GetNewNetID());
 
-			c->setPosition(35.90f, 273.55f);
-   
-			map->addObject(c);
-   
-			player->setSkinNo(skin);
-			player->setChampion(c);
-			static int id = 1;
-			player->userId = id; // same as StartClient.bat
-			id++;
-			player->setSummoners(strToId(summoner1), strToId(summoner2));
-   
-   
+           Champion* c = ChampionFactory::getChampionFromType(champion, map, GetNewNetID());
 
-			players.push_back(player);
+           c->setPosition(35.90f, 273.55f);
+
+           map->addObject(c);
+
+           player->setSkinNo(skin);
+           player->setChampion(c);
+           static int id = 1;
+           player->userId = id; // same as StartClient.bat
+           id++;
+           player->setSummoners(strToId(summoner1), strToId(summoner2));
+
+
+
+           players.push_back(player);
    
-		}catch(sol::error e)
+        } catch(sol::error e)
 		{
-				//printf("Error loading champion: \n%s", e.what());
-				break;  
+            //printf("Error loading champion: \n%s", e.what());
+            break;  
         }
     }
     
@@ -191,7 +177,7 @@ bool Game::initialize(ENetAddress *address, const char *baseKey){
 	return _isAlive = true;
 }
 
-void Game::netLoop()
+	void Game::netLoop()
 {
 	chrono::time_point<chrono::system_clock> tStart, tEnd;
 	tStart = chrono::high_resolution_clock::now();
