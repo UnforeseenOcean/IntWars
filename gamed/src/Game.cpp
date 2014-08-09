@@ -72,7 +72,7 @@ uint32 Game::strToId(std::string str){
     }else if(str == "TELEPORT"){
         return SPL_Teleport;
     }
-    
+	return SPL_Exhaust;
 }
 
 template<typename T>
@@ -114,65 +114,68 @@ bool Game::initialize(ENetAddress *address, const char *baseKey){
     
   //  lua.open_file("../../lua/config.lua");
     sol::table playerList = script.getTable("players");
-    for(int i=1;i<12;i++){
-        try{
-        std::string playerIndex = "player"+toString(i);
+    for(int i=1;i<12;i++)
+	{
+        try
+		{
+			std::string playerIndex = "player"+toString(i);
         
-    sol::table player1 = playerList.get<sol::table>(playerIndex);
+			sol::table player1 = playerList.get<sol::table>(playerIndex);
     
-    std::string rank = player1.get<std::string>("rank");
-    std::string name = player1.get<std::string>("name");
-    std::string champion = player1.get<std::string>("champion");
-    std::string team = player1.get<std::string>("team");
-    int skin = player1.get<int>("skin");
-    int ribbon = player1.get<int>("ribbon");
-    std::string summoner1 = player1.get<std::string>("summoner1");
-    std::string summoner2 = player1.get<std::string>("summoner2");
+			std::string rank = player1.get<std::string>("rank");
+			std::string name = player1.get<std::string>("name");
+			std::string champion = player1.get<std::string>("champion");
+			std::string team = player1.get<std::string>("team");
+			int skin = player1.get<int>("skin");
+			int ribbon = player1.get<int>("ribbon");
+			std::string summoner1 = player1.get<std::string>("summoner1");
+			std::string summoner2 = player1.get<std::string>("summoner2");
     
     
-       ClientInfo* player;
+			   ClientInfo* player;
     
-    if(team == "BLUE"){
-        player = new ClientInfo(rank, TEAM_BLUE, ribbon);
-    }else {
-        player = new ClientInfo(rank, TEAM_PURPLE, ribbon);
-    }
+			if(team == "BLUE"){
+				player = new ClientInfo(rank, TEAM_BLUE, ribbon);
+			}else {
+				player = new ClientInfo(rank, TEAM_PURPLE, ribbon);
+			}
 
 
    
-	// TODO : put the following in a config file !
+			// TODO : put the following in a config file !
  
-   player->setName(name);
+			player->setName(name);
    
    
    
-   Champion* c = ChampionFactory::getChampionFromType(champion, map, GetNewNetID());
+			Champion* c = ChampionFactory::getChampionFromType(champion, map, GetNewNetID());
 
-   c->setPosition(35.90f, 273.55f);
+			c->setPosition(35.90f, 273.55f);
    
-	map->addObject(c);
+			map->addObject(c);
    
-   player->setSkinNo(skin);
-	player->setChampion(c);
-   static int id = 1;
-   player->userId = id; // same as StartClient.bat
-   id++;
-   player->setSummoners(strToId(summoner1), strToId(summoner2));
+			player->setSkinNo(skin);
+			player->setChampion(c);
+			static int id = 1;
+			player->userId = id; // same as StartClient.bat
+			id++;
+			player->setSummoners(strToId(summoner1), strToId(summoner2));
    
    
 
-	players.push_back(player);
+			players.push_back(player);
    
-                }catch(sol::error e){
-                    //printf("Error loading champion: \n%s", e.what());
-          break;  
+		}catch(sol::error e)
+		{
+				//printf("Error loading champion: \n%s", e.what());
+				break;  
         }
     }
     
 
    
 	 //Uncomment the following to get 2-players
-	ClientInfo* player2 = new ClientInfo("GOLD", TEAM_BLUE);
+	/*ClientInfo* player2 = new ClientInfo("GOLD", TEAM_BLUE);
 	player2->setName("tseT");
 	Champion* c2 = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
 	c2->setPosition(100.f, 273.55f);
@@ -182,7 +185,7 @@ bool Game::initialize(ENetAddress *address, const char *baseKey){
 	player2->setSkinNo(4);
     player2->userId = 2; // same as StartClient.bat
     player2->setSummoners(SPL_Ignite, SPL_Flash);
-	players.push_back(player2);
+	players.push_back(player2);*/
 	
 	
 	return _isAlive = true;

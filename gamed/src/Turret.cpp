@@ -20,7 +20,7 @@ void Turret::update(int64 diff)
       for(auto& it : objects) {
          Unit* u = dynamic_cast<Unit*>(it.second);
 
-         if(!u || u->isDead() || u->getSide() == getSide() || distanceWith(u) > TURRET_RANGE) {
+         if(!u || u->isDead() || u->getSide() == getSide() || distance(*u) > TURRET_RANGE) {
             continue;
          }
 

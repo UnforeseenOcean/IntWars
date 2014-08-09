@@ -35,7 +35,7 @@ private:
         return luaL_ref(L, LUA_REGISTRYINDEX);
     }
 public:
-    reference() noexcept = default;
+    reference() NOEXCEPT = default;
 
     reference(lua_State* L, int index): L(L) {
         lua_pushvalue(L, index);
@@ -46,11 +46,11 @@ public:
         luaL_unref(L, LUA_REGISTRYINDEX, ref);
     }
 
-    void push() const noexcept {
+    void push() const NOEXCEPT {
         lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
     }
 
-    reference(reference&& o) noexcept {
+    reference(reference&& o) NOEXCEPT {
         L = o.L;
         ref = o.ref;
 
@@ -58,7 +58,7 @@ public:
         o.ref = LUA_NOREF;
     }
 
-    reference& operator=(reference&& o) noexcept {
+    reference& operator=(reference&& o) NOEXCEPT {
         L = o.L;
         ref = o.ref;
 
@@ -68,12 +68,12 @@ public:
         return *this;
     }
 
-    reference(const reference& o) noexcept {
+    reference(const reference& o) NOEXCEPT {
         L = o.L;
         ref = o.copy();
     }
 
-    reference& operator=(const reference& o) noexcept {
+    reference& operator=(const reference& o) NOEXCEPT {
         L = o.L;
         ref = o.copy();
         return *this;
@@ -86,7 +86,7 @@ public:
         return static_cast<type>(result);
     }
 
-    lua_State* state() const noexcept {
+    lua_State* state() const NOEXCEPT {
         return L;
     }
 };

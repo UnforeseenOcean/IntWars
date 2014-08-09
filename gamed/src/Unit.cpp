@@ -25,7 +25,7 @@ void Unit::update(int64 diff) {
          isAttacking = false;
       }
    }
-   else if(unitTarget && distanceWith(unitTarget) <= stats->getRange()) {
+   else if(unitTarget && distance(*unitTarget) <= stats->getRange()) {
       if(autoAttackCurrentCooldown <= 0) {
          isAttacking = true;
          autoAttackCurrentDelay = 0;

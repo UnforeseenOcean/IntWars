@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "LuaScript.h"
 #include "sol/state.hpp"
 LuaScript::LuaScript(){

@@ -72,9 +72,6 @@
     <ClInclude Include="..\..\gamed\include\Projectile.h">
       <Filter>logic</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gamed\include\Spell.h">
-      <Filter>logic</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\gamed\include\Stats.h">
       <Filter>logic</Filter>
     </ClInclude>
@@ -127,6 +124,12 @@
     <ClInclude Include="..\..\dep\include\raf\tinydir.h">
       <Filter>ExtLib\RAF</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\gamed\include\LuaScript.h">
+      <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Spell.h">
+      <Filter>logic\Characters</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\gamed\src\main.cpp" />
@@ -137,9 +140,6 @@
       <Filter>logic</Filter>
     </ClCompile>
     <ClCompile Include="..\..\gamed\src\Object.cpp">
-      <Filter>logic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gamed\src\Spell.cpp">
       <Filter>logic</Filter>
     </ClCompile>
     <ClCompile Include="..\..\gamed\src\Unit.cpp">
@@ -189,6 +189,12 @@
     </ClCompile>
     <ClCompile Include="..\..\gamed\src\Turret.cpp">
       <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\LuaScript.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Spell.cpp">
+      <Filter>logic\Characters</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -524,12 +524,6 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
 
          peerInfo(peer)->getChampion()->getStats().setLevel(data);
          return true;
-			std::string mob(tmp);
-
-
-			if(mob == mcmd[0]){
-
-			return true;
 		}
 
 
@@ -576,7 +570,8 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
    return false;
 }
 
-bool Game::handleSkillUp(HANDLE_ARGS) {
+bool Game::handleSkillUp(HANDLE_ARGS) 
+{
 	SkillUpPacket *skillUpPacket = reinterpret_cast<SkillUpPacket *>(packet->data);
 	//!TODO Check if can up skill? :)
 

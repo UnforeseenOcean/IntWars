@@ -60,7 +60,7 @@ Spell::Spell(Champion* owner, const std::string& spellName, uint8 slot) : owner(
  * Called when the character casts the spell
  */
 bool Spell::cast(float x, float y, Unit* u) {
-   owner->setPosition(owner->getX(), owner->getY());//stop moving serverside too. TODO: check for each spell if they stop movement or not
+   owner->setPosition(owner->x, owner->y);//stop moving serverside too. TODO: check for each spell if they stop movement or not
    state = STATE_CASTING;
    currentCastTime = castTime;
    
@@ -130,8 +130,8 @@ void Spell::loadLua(){
 
 void Spell::doLua(){
 
-   float ownerX = owner->getX(); //we need to do this for each variable exposed to Lua or we get a compiler error
-   float ownerY = owner->getY();
+   float ownerX = owner->x; //we need to do this for each variable exposed to Lua or we get a compiler error
+   float ownerY = owner->y;
    
    float spellX = x;
   
@@ -176,8 +176,8 @@ void Spell::doLua(){
    
    
    script.lua.set_function("addProjectile", [this, &projectileId, &projSpeed](float toX, float toY) { 
-   owner->setPosition(owner->getX(), owner->getY()); // stop moving
-   Projectile* p = new Projectile(owner->getMap(), GetNewNetID(), owner->getX(), owner->getY(), 30, owner, new Target(toX, toY), this, projSpeed, projectileId);
+   owner->setPosition(owner->x, owner->y); // stop moving
+   Projectile* p = new Projectile(owner->getMap(), GetNewNetID(), owner->x, owner->y, 30, owner, new Target(toX, toY), this, projSpeed, projectileId);
    owner->getMap()->addObject(p);
    owner->getMap()->getGame()->notifyProjectileSpawn(p);
 

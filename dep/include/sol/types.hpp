@@ -26,6 +26,13 @@
 #include <string>
 #include <type_traits>
 
+// Is noexcept supported?
+#ifndef _MSC_VER
+#define NOEXCEPT noexcept
+#else
+#define NOEXCEPT
+#endif
+
 namespace sol {
 struct nil_t {};
 const nil_t nil {};

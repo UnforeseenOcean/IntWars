@@ -25,10 +25,17 @@
 #include <stdexcept>
 #include <string>
 
+// Is noexcept supported?
+#ifndef _MSC_VER
+#define NOEXCEPT noexcept
+#else
+#define NOEXCEPT
+#endif
+
 namespace sol {
 class error : public std::runtime_error {
 public:
-    error(const std::string& str) noexcept: std::runtime_error("lua: error: " + str) {}
+	error(const std::string& str) NOEXCEPT : std::runtime_error("lua: error: " + str) {}
 };
 } // sol
 

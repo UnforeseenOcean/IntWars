@@ -27,6 +27,13 @@
 #include "function_types.hpp"
 #include "userdata.hpp"
 
+// Is noexcept supported?
+#ifndef _MSC_VER
+#define NOEXCEPT noexcept
+#else
+#define NOEXCEPT
+#endif
+
 namespace sol {
 class table : public reference {
     friend class state;
@@ -63,7 +70,7 @@ class table : public reference {
         return tuple_get(t, t, std::make_tuple(std::forward<Keys>(keys)...));
     }
 public:
-    table() noexcept : reference() {}
+    table() NOEXCEPT : reference() {}
     table(lua_State* L, int index = -1) : reference(L, index) {
         type_assert(L, index, type::table);
     }
@@ -111,7 +118,7 @@ public:
         return proxy<const table, T>(*this, std::forward<T>(key));
     }
 
-    void pop(int n = 1) const noexcept {
+    void pop(int n = 1) const NOEXCEPT {
         lua_pop(state(), n);
     }
 

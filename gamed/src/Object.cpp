@@ -2,7 +2,6 @@
 #include "Object.h"
 #include <cmath>
 #include <algorithm>
-#include "Vector2.h"
 
 using namespace std;
 
@@ -41,12 +40,12 @@ void Object::Move(int64 diff) {
 
 	if(!target)
 	  return;
-   Vector2 to = Vector2(target->getX(), target->getY());
-   Vector2 cur = Vector2(x, y);
+	glm::vec2 to = glm::vec2(target->x, target->y);
+	glm::vec2 cur = glm::vec2(x, y);
    
-   Vector2 goingTo =  to - cur;
+	glm::vec2 goingTo = to - cur;
 
-	Vector2 norm = goingTo.Normalize();
+	glm::vec2 norm = glm::normalize(goingTo);
 
 
 
@@ -55,8 +54,8 @@ void Object::Move(int64 diff) {
 
 
 
-	float xx = norm.X * deltaMovement;
-	float yy = norm.Y * deltaMovement;
+	float xx = norm.x * deltaMovement;
+	float yy = norm.y * deltaMovement;
 
       
    x+= xx;

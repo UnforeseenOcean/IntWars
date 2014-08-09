@@ -781,7 +781,7 @@ public:
       buffer << (uint8)0x80; // unk
       buffer << futureProjNetId; // Basic attack projectile ID, to be spawned later
       buffer << (uint8)0x40; // unk
-      buffer << attacker->getX() << attacker->getY();
+      buffer << attacker->x << attacker->y;
    }
 };
 
