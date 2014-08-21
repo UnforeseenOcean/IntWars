@@ -1,15 +1,17 @@
 #include "stdafx.h"
 #include "Item.h"
+#include "ItemManager.h"
 
-Item::Item() 
-{
-    id = -1;
-    stackAmount = 1;
-    active = false;
+uint32 ItemTemplate::getTotalPrice() const {
+   uint32 toReturn = price;
+   
+   for(uint32 itemId : recipes) {
+      const ItemTemplate* item = ItemManager::getInstance()->getItemTemplateById(itemId);
+      if(!item) {
+         continue;
+      }
+      toReturn += item->getTotalPrice();
+   }
+   
+   return toReturn;
 }
-
-
-
-
-
-

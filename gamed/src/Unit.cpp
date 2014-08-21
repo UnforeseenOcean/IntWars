@@ -19,7 +19,7 @@ void Unit::update(int64 diff) {
    if(isAttacking) {
       autoAttackCurrentDelay += diff/1000000.f;
       if(autoAttackCurrentDelay >= autoAttackDelay) {
-         Projectile* p = new Projectile(map, autoAttackProjId, x, y, 10, this, unitTarget, 0, autoAttackProjectileSpeed, RAFFile::getHash("EzrealMysticShotMissile"));
+         Projectile* p = new Projectile(map, autoAttackProjId, x, y, 5, this, unitTarget, 0, autoAttackProjectileSpeed, RAFFile::getHash("EzrealMysticShotMissile"));
          map->addObject(p);
          autoAttackCurrentCooldown = 1.f/(stats->getTotalAttackSpeed());
          isAttacking = false;
@@ -46,7 +46,7 @@ void Unit::update(int64 diff) {
    }
    
    statUpdateTimer += diff;
-   if(statUpdateTimer >= 500000) { // update stats (hpregen, manaregen) every seconds
+   if(statUpdateTimer >= 500000) { // update stats (hpregen, manaregen) every 0.5 seconds
       stats->update(statUpdateTimer);
       statUpdateTimer = 0;
    }
@@ -67,4 +67,13 @@ void Unit::dealDamageTo(Unit* target, float damage, DamageType type, DamageSourc
 
 bool Unit::isDead() const {
    return stats->getCurrentHealth() <= 0;
+}
+
+void Unit::setModel(const std::string& newModel) {
+    model = newModel;
+    modelUpdated = true;
+}
+
+const std::string& Unit::getModel() {
+    return model;
 }

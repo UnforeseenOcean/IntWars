@@ -73,7 +73,7 @@ class Game
 		bool handleBuyItem(HANDLE_ARGS);
 		bool handleCastSpell(HANDLE_ARGS);
 		bool handleClick(HANDLE_ARGS);
-		bool handleExit(HANDLE_ARGS);
+      bool handleSwapItems(HANDLE_ARGS);
       
 		// Notifiers
 		void notifyMinionSpawned(Minion* m);
@@ -82,9 +82,15 @@ class Game
 		void notifyMovement(Object* o);
 		void notifyDamageDone(Unit* source, Unit* target, float amount);
       void notifyAutoAttack(Unit* attacker, Unit* victim, uint32 futureProjNetId);
-		void notifyTeleport(Unit* u);
+      void notifyTeleport(Unit* u, float _x, float _y);
 		void notifyProjectileSpawn(Projectile* p);
-
+      void notifyProjectileDestroy(Projectile* p);
+      void notifyParticleSpawn(Champion* source, Target* target, const std::string& particleName);
+      void notifyModelUpdate(Unit* object);
+      void notifyLevelUp(Champion* c);
+      void notifyItemBought(Champion* c, const ItemInstance* i);
+      void notifyItemsSwapped(Champion* c, uint8 fromSlot, uint8 toSlot);
+      void notifyRemoveItem(Champion* c, uint8 slot);
 		// Tools
 		static void printPacket(const uint8 *buf, uint32 len);
 		void printLine(uint8 *buf, uint32 len);
@@ -94,6 +100,8 @@ class Game
 		bool sendPacket(ENetPeer *peer, const Packet& packet, uint8 channelNo, uint32 flag = RELIABLE);
 		bool broadcastPacket(uint8 *data, uint32 length, uint8 channelNo, uint32 flag = RELIABLE);
 		bool broadcastPacket(const Packet& packet, uint8 channelNo, uint32 flag = RELIABLE);
+      bool broadcastPacketTeam(uint8 team, const uint8 *data, uint32 length, uint8 channelNo, uint32 flag = RELIABLE);
+      bool broadcastPacketTeam(uint8 team, const Packet& packet, uint8 channelNo, uint32 flag = RELIABLE);
 	 
 		
 

@@ -44,6 +44,7 @@ void Game::initHandlers()
    registerHandler(&Game::handleSkillUp,		    PKT_C2S_SkillUp, CHL_C2S);
    registerHandler(&Game::handleEmotion,		    PKT_C2S_Emotion, CHL_C2S);
    registerHandler(&Game::handleBuyItem,		    PKT_C2S_BuyItemReq, CHL_C2S);
+   registerHandler(&Game::handleSwapItems,		 PKT_C2S_SwapItems, CHL_C2S);
    registerHandler(&Game::handleNull,            PKT_C2S_LockCamera, CHL_C2S);
    registerHandler(&Game::handleNull,            PKT_C2S_StatsConfirm, CHL_C2S);
    registerHandler(&Game::handleClick,           PKT_C2S_Click, CHL_C2S);
@@ -151,6 +152,22 @@ bool Game::broadcastPacket(const Packet& packet, uint8 channelNo, uint32 flag) {
    return broadcastPacket((uint8*)&packet.getBuffer().getBytes()[0], packet.getBuffer().size(), channelNo, flag);
 }
 
+bool Game::broadcastPacketTeam(uint8 team, const uint8 *data, uint32 length, uint8 channelNo, uint32 flag)
+{
+	for(ClientInfo* ci : players) {
+      if(ci->getPeer() && ci->getTeam() == team) {
+         sendPacket(ci->getPeer(), data, length, channelNo, flag);
+      }
+   }
+   
+	return true;
+}
+
+bool Game::broadcastPacketTeam(uint8 team, const Packet& packet, uint8 channelNo, uint32 flag)
+{
+	return broadcastPacketTeam(team, (const uint8*)&packet.getBuffer().getBytes()[0], packet.getBuffer().size(), channelNo, flag);
+}
+
 bool Game::handlePacket(ENetPeer *peer, ENetPacket *packet, uint8 channelID)
 {
 	if(packet->dataLength >= 8)
@@ -160,19 +177,15 @@ bool Game::handlePacket(ENetPeer *peer, ENetPacket *packet, uint8 channelID)
 	}
 
 	PacketHeader *header = reinterpret_cast<PacketHeader*>(packet->data);	
-	Logging->writeLine("Handling OpCode %02X\n", header->cmd);
 	bool (Game::*handler)(HANDLE_ARGS) = _handlerTable[header->cmd][channelID];
 	
 	if(handler)
 	{
-		if(!(*this.*handler)(peer,packet))
-		{
-			Logging->error("Packet handling failed!");
-		}
+		return (*this.*handler)(peer,packet);
 	}
 	else
 	{
-		PDEBUG_LOG_LINE(Logging,"Unknown packet: CMD %X(%i) CHANNEL %X(%i)\n", header->cmd, header->cmd,channelID,channelID);
+      printf("Unhandled OpCode %02X\n", header->cmd);
 		printPacket(packet->data, packet->dataLength);
 	}
 	return true;

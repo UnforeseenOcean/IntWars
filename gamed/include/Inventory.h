@@ -1,45 +1,29 @@
-
-
 #ifndef INVENTORY_H
-#define   INVENTORY_H
+#define INVENTORY_H
 
 #define MAX_STACK_AMOUNT 5
 
 #include "stdafx.h"
 #include "Item.h"
 
-#include "Items/NoItem.h"
 
+class Inventory {
+private:
+   std::vector<ItemInstance*> items;
+   std::vector<ItemInstance*> _getAvailableRecipeParts(const ItemTemplate* recipe);
 
-class Inventory{
-           
 public:
     
-   Inventory();
-
-
-   Item items[6];//0-6 = default items, 6 = trinket
-        
-        void setItem(Item &item, Item newItem){
-            item = newItem;
-        }
-        
-
-    bool isFull(){
-        for(int i=0;i<7;i++){
-            if(items[i].active == false || items[i].id == -1){
-                return false;
-            }
-        }
-        return true;
-    } 
-      
-    
-    bool addItemNew(Item _item);
-    
-    bool containsItem(int id);
-    
-
+   Inventory() {
+      items = { 0, 0, 0, 0, 0, 0, 0 };
+   }
+   
+   const ItemInstance* addItem(const ItemTemplate* itemTemplate);
+   void swapItems(uint8 slotFrom, uint8 slotTo);
+   const std::vector<ItemInstance*>& getItems() const { return items; }
+   void removeItem(uint8 slot);
+   
+   std::vector<ItemInstance*> getAvailableRecipeParts(const ItemTemplate* recipe);
     
 };
 

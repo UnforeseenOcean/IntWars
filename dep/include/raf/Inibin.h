@@ -10,12 +10,13 @@
 using namespace std;
 
 struct Value {
-   Value() : floatV(0), boolV(0) {
+   Value() : floatV(0), boolV(0), intV(0) {
    
    }
 
    float floatV;
    bool boolV;
+   uint32 intV;
    std::string stringV;
 };
 
@@ -25,6 +26,10 @@ public:
       
       size = buffer.size();
       buffer >> version >> oldLength >> bitmask;
+      
+      if(version != 2) {
+         return;
+      }
       
       uint16 nbKeys;
       
@@ -58,6 +63,42 @@ public:
          readBooleanValues(readKeys(nbKeys));
       }
       
+      // 3
+      if(bitmask & 0x0040) {
+         buffer >> nbKeys;
+         buffer.skip(nbKeys*(4+3));
+      }
+      
+      // 12
+      if(bitmask & 0x0080) {
+         buffer >> nbKeys;
+         buffer.skip(nbKeys*(4+12));
+      }
+      
+      // 2
+      if(bitmask & 0x0100) {
+         buffer >> nbKeys;
+         readUint16Values(readKeys(nbKeys));
+      }
+      
+      // 8
+      if(bitmask & 0x0200) {
+         buffer >> nbKeys;
+         buffer.skip(nbKeys*(4+8));
+      }
+      
+      // 4
+      if(bitmask & 0x0400) {
+         buffer >> nbKeys;
+         readUint32Values(readKeys(nbKeys));
+      }
+      
+      // 16
+      if(bitmask & 0x0800) {
+         buffer >> nbKeys;
+         buffer.skip(nbKeys*(4+16));
+      }
+      
       if(bitmask & 0x1000) {
          buffer >> nbKeys;
          readStringValues(readKeys(nbKeys));
@@ -73,7 +114,7 @@ public:
          toReturn.push_back(key);
       }
       
-      return toReturn;
+      return toReturn;std::vector<unsigned char> iniFile;
    }
    
    static uint32 getKeyHash(const std::string& sectionName, const std::string& varName) {
@@ -98,6 +139,8 @@ public:
       
          Value value;
          value.floatV = v;
+         value.intV = v;
+         
          values[key] = value;
       }
    }
@@ -109,6 +152,7 @@ public:
          
          Value value;
          value.floatV = v;
+         value.intV = v;
          values[key] = value;
       }
    }
@@ -120,6 +164,7 @@ public:
                   
          Value value;
          value.floatV = v;
+         value.intV = v;
          values[key] = value;
       }
    }
@@ -157,6 +202,7 @@ public:
          }
          
          value.boolV = boolean & 0x01;
+         value.intV = boolean & 0x01;
          values[key] = value;
          ++index;
       }
@@ -178,7 +224,7 @@ public:
    }
          
    float getFloatValue(const std::string& sectionName, const std::string& varName) {
-      if(values[getKeyHash(sectionName, varName)].floatV == 0 && values[getKeyHash(sectionName, varName)].stringV[0] != 0) {
+      if(values[getKeyHash(sectionName, varName)].floatV == 0 && values[getKeyHash(sectionName, varName)].stringV.length() > 0) {
          return atof(values[getKeyHash(sectionName, varName)].stringV.c_str());
       }
       return values[getKeyHash(sectionName, varName)].floatV;
@@ -188,12 +234,46 @@ public:
       return values[getKeyHash(sectionName, varName)].boolV;
    }
    
+   uint32 getIntValue(const std::string& sectionName, const std::string& varName) {
+      return getIntValue(getKeyHash(sectionName, varName));
+   }
+   
+   uint32 getIntValue(uint32 keyHash) {
+      if(values[keyHash].intV == 0 && values[keyHash].stringV.length() > 0) {
+         return atoi(values[keyHash].stringV.c_str());
+      }
+      return values[keyHash].intV;
+   }
+   
    const std::string& getStringValue(const std::string& sectionName, const std::string& varName) {
       return values[getKeyHash(sectionName, varName)].stringV;
    }
    
    bool keyExists(const std::string& sectionName, const std::string& varName) {
       return values.find(getKeyHash(sectionName, varName)) != values.end();
+   }
+   
+   void printValues() {
+      for(auto& v : values) {
+         printf("%08X : ", v.first);
+         if(!v.second.stringV.empty()) {
+            printf("\"%s\"\n", v.second.stringV.c_str());
+            continue;
+         }
+         
+         if(!v.second.intV && !v.second.floatV) {
+            printf("%d\n", v.second.boolV);
+            
+            continue;
+         }
+         
+         if(!v.second.intV) {
+            printf("%f\n", v.second.floatV);
+            continue;
+         }
+         
+         printf("%d\n", v.second.intV);
+      }
    }
 
 private:
