@@ -18,8 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "stdafx.h"
 #include "Game.h"
 #include "Packets.h"
-#include "Inventory.h"
-#include "ItemFactory.h"
+#include "ItemManager.h"
 #include "ChatBox.h"
 
 #include <vector>
@@ -46,6 +45,7 @@ bool Game::handleKeyCheck(ENetPeer *peer, ENetPacket *packet) {
 		if(player->userId == userId) {
 			player->SetPeer(peer);
 			peer->data = player;
+         player->setPeer(peer);
 			KeyCheck response;
 			response.userId = keyCheck->userId;
          response.playerNo = playerNo;
@@ -162,9 +162,9 @@ bool Game::handleStartGame(HANDLE_ARGS) {
 }
 
 bool Game::handleAttentionPing(ENetPeer *peer, ENetPacket *packet) {
-	AttentionPing *ping = reinterpret_cast<AttentionPing *>(packet->data);
-	AttentionPingAns response(peerInfo(peer), ping);
-	return broadcastPacket(response, CHL_S2C);
+   AttentionPing *ping = reinterpret_cast<AttentionPing *>(packet->data);
+   AttentionPingAns response(peerInfo(peer), ping);
+   return broadcastPacketTeam(peerInfo(peer)->getTeam(), response, CHL_S2C);
 }
 
 bool Game::handleView(ENetPeer *peer, ENetPacket *packet) {
@@ -230,8 +230,6 @@ bool Game::handleMove(ENetPeer *peer, ENetPacket *packet) {
 		//TODO, Implement stop commands
 	case STOP:
 		{
-       
-       
        //TODO anticheat, currently it trusts client 100%
        
       peerInfo(peer)->getChampion()->setPosition(request->x, request->y);
@@ -286,27 +284,28 @@ bool Game::handleClick(HANDLE_ARGS) {
 }
 
 bool Game::handleCastSpell(HANDLE_ARGS) {
-	CastSpell *spell = reinterpret_cast<CastSpell *>(packet->data);
+   CastSpell *spell = reinterpret_cast<CastSpell *>(packet->data);
 
-	Logging->writeLine("Spell Cast : Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X\n", spell->spellSlot & 0x3F, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
+   printf("Spell Cast : Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X\n", spell->spellSlot & 0x3F, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
 
-	Spell* s = peerInfo(peer)->getChampion()->castSpell(spell->spellSlot & 0x3F, spell->x, spell->y, 0);
+   uint32 futureProjNetId = GetNewNetID();
+   Spell* s = peerInfo(peer)->getChampion()->castSpell(spell->spellSlot & 0x3F, spell->x, spell->y, 0, futureProjNetId);
 
-	if(!s) {
-		return false;
-	}
+   if(!s) {
+      return false;
+   }
+   
+   CastSpellAns response(s, spell->x, spell->y, futureProjNetId);
+   broadcastPacket(response, CHL_S2C);
 
-	CastSpellAns response(s, spell->x, spell->y);
-	sendPacket(peer, response, CHL_S2C);
-
-	return true;
+   return true;
 }
 
 bool Game::handleChatBoxMessage(HANDLE_ARGS) {
    ChatMessage *message = reinterpret_cast<ChatMessage *>(packet->data);
    //Lets do commands
    if(message->msg == '.') {
-      const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn", ".size", ".junglespawn", ".skillpoints", ".level" };
+      const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn", ".size", ".junglespawn", ".skillpoints", ".level", ".announce" };
       
       // help command
 		if (strncmp(message->getMessage(), cmd[9], strlen(cmd[9])) == 0)
@@ -326,8 +325,8 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
 			SendServerMessage(peer, ".spawn - spawns 3 minions per side\n"
 				".spawnjungle [baron/wolves/red/blue/dragon/wraiths/golems] - Spawns a specific type of jungle monster\n"
 				".skillpoints - Enable all skillpoints (like set to level 18)");
-			SendServerMessage(peer, ".cooldown [spellNo] [value] - Set cooldown of a specific (SpellNo) spell");
-			SendServerMessage(peer, ".announce - Calls the announcer");
+			SendServerMessage(peer, ".level [value] - sets champion to [value] level\n"
+				".announce - Calls the announcer");
 
          return true;
       }
@@ -425,7 +424,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
 			Logging->writeLine(ss.str().c_str());
 			SendServerMessage(peer, ss.str());
 
-         peerInfo(peer)->getChampion()->getStats().setBaseAp(data);
+         peerInfo(peer)->getChampion()->getStats().setBonusApFlat(data);
          return true;
       }
       
@@ -440,14 +439,14 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
 			Logging->writeLine(ss.str().c_str());
 			SendServerMessage(peer, ss.str());
 
-         peerInfo(peer)->getChampion()->getStats().setBaseAd(data);
+         peerInfo(peer)->getChampion()->getStats().setBonusAdFlat(data);
          return true;
       }
       
       // Mana
       if(strncmp(message->getMessage(), cmd[7], strlen(cmd[7])) == 0)
       {
-         float data = (float)atoi(&message->getMessage()[strlen(cmd[5])+1]);
+         float data = (float)atoi(&message->getMessage()[strlen(cmd[7])+1]);
 
 			std::stringstream ss;
 			ss << "Setting Mana to " << data;
@@ -462,8 +461,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
       // Model
       if(strncmp(message->getMessage(), cmd[8], strlen(cmd[8])) == 0) {
          std::string sModel = (char *)&message->getMessage()[strlen(cmd[8]) + 1];
-         UpdateModel modelPacket(peerInfo(peer)->getChampion()->getNetId(), (char *)sModel.c_str()); //96
-         broadcastPacket(reinterpret_cast<uint8 *>(&modelPacket), sizeof(UpdateModel), CHL_S2C);
+         peerInfo(peer)->getChampion()->setModel(sModel);
          return true;
       }
       
@@ -495,19 +493,6 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
          return true;
 			return true;
 
-		}
-
-		//cooldown
-		if(strncmp(message->getMessage(), cmd[14], strlen(cmd[14])) == 0)
-		{
-			uint32 spellNo;
-			float value;
-
-			sscanf(&message->getMessage()[strlen(cmd[14])+1], "%u %f", &spellNo, &value);
-			Spell* s = peerInfo(peer)->getChampion()->GetSpell(spellNo-1);
-			s->setCooldown(s->getLevel(),value);
-
-			return true;
 		}
 
 		//announce
@@ -552,16 +537,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
    case CMT_ALL:
       return broadcastPacket(packet->data, packet->dataLength, CHL_COMMUNICATION);
    case CMT_TEAM:
-		
-		for(int i=0; i < players.size();i++)
-		{
-			if(players[i]->getTeam() == peerInfo(peer)->getTeam())
-			{
-				if(!sendPacket(players[i]->GetPeer(), packet->data, packet->dataLength, CHL_COMMUNICATION))
-					return false;
-			}
-		}
-		return true;
+      return broadcastPacketTeam(peerInfo(peer)->getTeam(), packet->data, packet->dataLength, CHL_COMMUNICATION);
    default:
       //Logging->errorLine("Unknown ChatMessageType\n");
       return sendPacket(peer, packet->data, packet->dataLength, CHL_COMMUNICATION); 
@@ -591,33 +567,62 @@ bool Game::handleSkillUp(HANDLE_ARGS)
 }
 
 bool Game::handleBuyItem(HANDLE_ARGS) {
-
-	BuyItemReq *request = reinterpret_cast<BuyItemReq *>(packet->data);
-
-	Item newItem = ItemFactory::getItemFromId(request->id);
-
-
-    
-    //if(!peerInfo(peer)->getChampion()->inventory.isFull() == false){
-        printf("Add new item");
-        peerInfo(peer)->getChampion()->inventory.addItemNew(newItem);
-    //}
-
-
+   
+   BuyItemReq *request = reinterpret_cast<BuyItemReq *>(packet->data);
+   
+   const ItemTemplate* itemTemplate = ItemManager::getInstance()->getItemTemplateById(request->id);
+   if(!itemTemplate) {
+      return false;
+   }
+   
+   std::vector<ItemInstance*> recipeParts = peerInfo(peer)->getChampion()->getInventory().getAvailableRecipeParts(itemTemplate);
+   uint32 price = itemTemplate->getTotalPrice();
+   const ItemInstance* i;
+   
+   if(recipeParts.empty()) {
+      if(peerInfo(peer)->getChampion()->getStats().getGold() < price) {
+         return true;
+      }
+   
+      i = peerInfo(peer)->getChampion()->getInventory().addItem(itemTemplate);
+   
+      if(i == 0) { // Slots full
+         return false;
+      }
+   } else {
+      for(ItemInstance* instance : recipeParts) {
+         price -= instance->getTemplate()->getTotalPrice();
+      }
       
-    for(int i=0x0;i<0x6;i++){//loop through all inventory slots, and update them
-		if(peerInfo(peer)->getChampion()->inventory.items[i].id != -1){
-			BuyItemAns response;
-			response.header.netId = request->header.netId;
-			response.itemId = peerInfo(peer)->getChampion()->inventory.items[i].id;
-			response.slotId = i;
-			response.stack = peerInfo(peer)->getChampion()->inventory.items[i].stackAmount;
-			broadcastPacket(reinterpret_cast<uint8 *>(&response), sizeof(response), CHL_S2C);
-		}
-	}
+      if(peerInfo(peer)->getChampion()->getStats().getGold() < price) {
+         return false;
+      }
+   
+      for(ItemInstance* instance : recipeParts) {
+         peerInfo(peer)->getChampion()->getStats().unapplyStatMods(instance->getTemplate()->getStatMods());
+         notifyRemoveItem(peerInfo(peer)->getChampion(), instance->getSlot());
+         peerInfo(peer)->getChampion()->getInventory().removeItem(instance->getSlot());
+      }
+      
+      i = peerInfo(peer)->getChampion()->getInventory().addItem(itemTemplate);
+   }
+   
+   peerInfo(peer)->getChampion()->getStats().setGold(peerInfo(peer)->getChampion()->getStats().getGold()-price);
+   peerInfo(peer)->getChampion()->getStats().applyStatMods(itemTemplate->getStatMods());
+   notifyItemBought(peerInfo(peer)->getChampion(), i);
+   
+   return true;
+}
 
-
-	return true;
+bool Game::handleSwapItems(HANDLE_ARGS) {
+   SwapItemsReq* request = reinterpret_cast<SwapItemsReq*>(packet->data);
+   
+   if(request->slotFrom > 6 || request->slotTo > 6) {
+      return false;
+   }
+   
+   peerInfo(peer)->getChampion()->getInventory().swapItems(request->slotFrom, request->slotTo);
+   notifyItemsSwapped(peerInfo(peer)->getChampion(), request->slotFrom, request->slotTo);
 }
 
 bool Game::handleEmotion(HANDLE_ARGS) {

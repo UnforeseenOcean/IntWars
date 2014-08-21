@@ -7,14 +7,18 @@ function finishCasting()
     to:sub(current)
     to:normalize()
 
-    local range = Vector2:Mult(to,1150)
+    local range = Vector2:Mult(to, 1500)
     local trueCoords = Vector2:Add(current, range)
 
     addServerProjectile(trueCoords.x, trueCoords.y)
 end
 
 function applyEffects()
-   dealPhysicalDamage(getEffectValue(0))
    
-   addParticleTarget("caitlyn_Base_Q_mis.troy", getTarget())
+   dealMagicalDamage(getEffectValue(0))
+   
+   -- TODO this can be fetched from projectile inibin "HitEffectName"
+   addParticleTarget("Nidalee_Base_Q_Tar.troy", getTarget())
+   
+   destroyProjectile()
 end

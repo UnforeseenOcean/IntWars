@@ -79,8 +79,7 @@ std::string toString(const T& value)
     return oss.str();
 }
 
-bool Game::initialize(ENetAddress *address, const char *baseKey)
-{
+bool Game::initialize(ENetAddress *address, const char *baseKey){
     if (enet_initialize () != 0)
         return false;
     atexit(enet_deinitialize);
@@ -96,9 +95,7 @@ bool Game::initialize(ENetAddress *address, const char *baseKey)
     _blowfish = new BlowFish((uint8*)key.c_str(), 16);
     initHandlers();
    
-   
-   printf("Before map");
-	map = new SummonersRift(this);
+   map = new SummonersRift(this);
    
    //TODO: better lua implementation
    
@@ -111,11 +108,9 @@ bool Game::initialize(ENetAddress *address, const char *baseKey)
     
   //  lua.open_file("../../lua/config.lua");
     sol::table playerList = script.getTable("players");
-    for(int i=1;i<12;i++)
-	{
-        try
-		{
-			std::string playerIndex = "player"+toString(i);
+    for (int i=1;i<12;i++) {
+        try {
+            std::string playerIndex = "player"+toString(i);
         
             sol::table playerData = playerList.get<sol::table>(playerIndex);
 
@@ -125,10 +120,11 @@ bool Game::initialize(ENetAddress *address, const char *baseKey)
             std::string team = playerData.get<std::string>("team");
             int skin = playerData.get<int>("skin");
             int ribbon = playerData.get<int>("ribbon");
+            int icon = playerData.get<int>("icon");
             std::string summoner1 = playerData.get<std::string>("summoner1");
             std::string summoner2 = playerData.get<std::string>("summoner2");
 
-            ClientInfo* player = new ClientInfo(rank, ((team == "BLUE") ? TEAM_BLUE : TEAM_PURPLE), ribbon);
+            ClientInfo* player = new ClientInfo(rank, ((team == "BLUE") ? TEAM_BLUE : TEAM_PURPLE), ribbon, icon);
 
            player->setName(name);
 
@@ -137,6 +133,8 @@ bool Game::initialize(ENetAddress *address, const char *baseKey)
            Champion* c = ChampionFactory::getChampionFromType(champion, map, GetNewNetID());
 
            c->setPosition(35.90f, 273.55f);
+           c->setSide((team == "BLUE") ? 0 : 1);
+           c->levelUp();
 
            map->addObject(c);
 
@@ -151,40 +149,36 @@ bool Game::initialize(ENetAddress *address, const char *baseKey)
 
            players.push_back(player);
    
-        } catch(sol::error e)
-		{
+        } catch(sol::error e) {
             //printf("Error loading champion: \n%s", e.what());
             break;  
         }
     }
     
-
    
-	 //Uncomment the following to get 2-players
-	/*ClientInfo* player2 = new ClientInfo("GOLD", TEAM_BLUE);
-	player2->setName("tseT");
-	Champion* c2 = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
-	c2->setPosition(100.f, 273.55f);
-	map->addObject(c2);
-    c2->setSide(1);
-	player2->setChampion(c2);
-	player2->setSkinNo(4);
-    player2->userId = 2; // same as StartClient.bat
-    player2->setSummoners(SPL_Ignite, SPL_Flash);
-	players.push_back(player2);*/
-	
+   // Uncomment the following to get 2-players
+   /*ClientInfo* player2 = new ClientInfo("GOLD", TEAM_PURPLE);
+   player2->setName("tseT");
+   Champion* c2 = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
+   c2->setPosition(100.f, 273.55f);
+   c2->setSide(1);
+   map->addObject(c2);
+   player2->setChampion(c2);
+   player2->setSkinNo(4);
+   player2->userId = 2; // same as StartClient.bat
+   player2->setSummoners(SPL_Ignite, SPL_Flash);
+   
+   players.push_back(player2);*/
 	
 	return _isAlive = true;
 }
 
 	void Game::netLoop()
 {
-	chrono::time_point<chrono::system_clock> tStart, tEnd;
-	tStart = chrono::high_resolution_clock::now();
-	long long tDiff;
 	ENetEvent event;
-
-	
+	std::chrono::time_point<std::chrono::high_resolution_clock> tStart, tEnd;
+	tStart = std::chrono::high_resolution_clock::now();
+	long long tDiff;
 
 	while(true)
 	{

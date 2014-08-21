@@ -5,6 +5,11 @@
 #include "Projectile.h"
 #include "Spell.h"
 #include "Unit.h"
+#include "Minion.h"
+#include "Turret.h"
+#include "Champion.h"
+
+using namespace std;
 
 void Projectile::update(int64 diff) {
 
@@ -20,9 +25,46 @@ void Projectile::update(int64 diff) {
             return;
          }
          
-         if(collide(it.second) && it.second->getNetId() != getNetId()) {//projectile shouldn't collide with itself
-            printf("Collide with 0x%08X !\n", it.second->getNetId());
-            originSpell->applyEffects(it.second, this);
+         if(collide(it.second)) {
+         
+            if(find(objectsHit.begin(), objectsHit.end(), it.second) != objectsHit.end()) {
+               continue;
+            }
+         
+            Unit* u = dynamic_cast<Unit*>(it.second);
+            if(!u) {
+               continue;
+            }
+            
+            if(u->getSide() == owner->getSide() && !(flags & SPELL_FLAG_AffectFriends)) {
+               continue;
+            }
+            
+            if(u->getSide() != owner->getSide() && !(flags & SPELL_FLAG_AffectEnemies)) {
+               continue;
+            }
+            
+            if(u->isDead() && !(flags & SPELL_FLAG_AffectDead)) {
+               continue;
+            }
+            
+            Minion* m = dynamic_cast<Minion*>(u);
+            if(m && !(flags & SPELL_FLAG_AffectMinions)) {
+               continue;
+            }
+            
+            Turret* t = dynamic_cast<Turret*>(u);
+            if(t && !(flags & SPELL_FLAG_AffectTurrets)) {
+               continue;
+            }
+            
+            Champion* c = dynamic_cast<Champion*>(u);
+            if(c && !(flags & SPELL_FLAG_AffectHeroes)) {
+               continue;
+            }
+            
+            objectsHit.push_back(u);
+            originSpell->applyEffects(u, this);
          }
       }
    } else {

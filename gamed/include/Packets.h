@@ -125,7 +125,8 @@ public:
 			buffer.fill(0, 64-p->getName().length());
 			buffer.fill(0, 64);
 			buffer << p->getRank();
-         buffer.fill(0, 28-p->getRank().length());
+         buffer.fill(0, 24-p->getRank().length());
+         buffer << p->getIcon();
          buffer << (uint16)p->getRibbon();
 		}
 
@@ -281,29 +282,25 @@ struct Unk {
 	uint32 targetNetId;
 };
 
-struct MinionSpawn {
-
-	MinionSpawn(const Minion* m) : netId(m->getNetId()), netId2(m->getNetId()), netId3(m->getNetId()), unk(0x00150017), unk2(0x03), position(m->getPosition()), unk4(0xff), unk5_1(1), type(m->getType()), unk5_3(0), unk5_4(1), unk7(5), unk8(0x0ff84540f546f424) {
-		header.cmd = PKT_S2C_MinionSpawn;
-		header.netId = m->getNetId();
-		memcpy(unk6, "\x0a\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x3f\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x2c\x27\x00\x00\x06", 36);
-	}
-
-	PacketHeader header;
-
-	uint32 unk;
-	uint8 unk2;
-	uint32 netId, netId2;
-	uint32 position;
-	uint8 unk4;
-	uint8 unk5_1;
-	uint8 type;
-	uint8 unk5_3;
-	uint8 unk5_4;
-	uint8 unk6[36];
-	uint32 netId3;
-	uint8 unk7;
-	uint64 unk8;
+class MinionSpawn : public BasePacket {
+public:
+   MinionSpawn(const Minion* m) : BasePacket(PKT_S2C_MinionSpawn, m->getNetId()) {
+      buffer << (uint32)0x00150017; // unk
+      buffer << (uint8)0x03; // SpawnType - 3 = minion
+      buffer << m->getNetId() << m->getNetId();
+      buffer << (uint32)m->getPosition();
+      buffer << (uint8)0xFF; // unk
+      buffer << (uint8)1; // unk
+      buffer << (uint8)m->getType();
+      buffer << (uint8)0; // unk
+      buffer << (uint8)1; // unk
+      buffer << "\x0a\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x3f\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x2c\x27";
+      buffer << (uint8)2; // coordCount
+      buffer << m->getNetId();
+      buffer << (uint8)0; // movement mask
+      buffer << MovementVector::targetXToNormalFormat(m->x);
+      buffer << MovementVector::targetYToNormalFormat(m->y);
+   }
 };
 
 struct MovementReq {
@@ -645,25 +642,44 @@ typedef struct _BuyItemReq {
 } BuyItemReq;
 
 typedef struct _BuyItemAns {
-	_BuyItemAns() {
-		header.cmd = (PacketCmd)PKT_S2C_BuyItemAns;
-		unk1 = 0;
-		unk2 = 0;
-		unk3 = 0;
-	}
-	PacketHeader header;
-	uint16 itemId;
-	uint16 unk1;
-	uint8 slotId;
-	uint8 stack;
-	uint16 unk2;
-	uint8 unk3;
+    _BuyItemAns() {
+        header.cmd = (PacketCmd)PKT_S2C_BuyItemAns;
+        unk2 = 0;
+        unk3 = 0x40;
+    }
+    PacketHeader header;
+    uint32 itemId;
+    uint8 slotId;
+    uint8 stack;
+    uint8 unk2;
+    uint8 unk3;
 } BuyItemAns;
+
+class RemoveItem : public BasePacket {
+public:
+   RemoveItem(Unit* u, uint8 slot) : BasePacket(PKT_S2C_RemoveItem, u->getNetId()) {
+      buffer << slot;
+      buffer << (uint8)0; // unk
+   }
+};
 
 typedef struct _EmotionPacket {
 	PacketHeader header;
 	uint8 id;
 } EmotionPacket;
+
+struct SwapItemsReq {
+    PacketHeader header;
+    uint8 slotFrom;
+    uint8 slotTo;
+};
+
+class SwapItemsAns : public BasePacket {
+public:
+   SwapItemsAns(Champion* c, uint8 slotFrom, uint8 slotTo) : BasePacket(PKT_S2C_SwapItems, c->getNetId()) {
+      buffer << slotFrom << slotTo;
+   }
+};
 
 typedef struct _EmotionResponse {
 	_EmotionResponse() {
@@ -847,31 +863,29 @@ struct CastSpell {
 
 class CastSpellAns : public GamePacket {
 public:
-	CastSpellAns(Spell* s, float x, float y) : GamePacket(PKT_S2C_CastSpellAns, s->getOwner()->getNetId()) {
-      printf("%08X ; %08X ; %f\n", s->getId(), s->getOwner()->getChampionHash(), s->getCastTime());
-		buffer << (uint8)0 << (uint8)0x66 << (uint8)0x00; // unk
+   CastSpellAns(Spell* s, float x, float y, uint32 futureProjNetId) : GamePacket(PKT_S2C_CastSpellAns, s->getOwner()->getNetId()) {
+      buffer << (uint8)0 << (uint8)0x66 << (uint8)0x00; // unk
       buffer << s->getId(); // Spell hash, for example hash("EzrealMysticShot")
-		buffer << (uint32)0x400001f6; // a net ID, but what for..
-		buffer << (uint8)0 << (uint8)0 << (uint8)0;
-		buffer << (uint16)0x3f80; // unk
-		buffer << s->getOwner()->getNetId() << s->getOwner()->getNetId();
+      buffer << (uint32)0x400001f6; // a net ID, but what for..
+      buffer << (uint8)0; // unk
+      buffer << 1.0f; // unk
+      buffer << s->getOwner()->getNetId() << s->getOwner()->getNetId();
       buffer << (uint32)s->getOwner()->getChampionHash();
-		buffer << (uint32)0x400001f5; // Another net ID..
-		buffer << x << 55.f << y;
-		buffer << x << 55.f << y;
-		buffer << (uint8)0;
-		buffer << s->getCastTime();
-		buffer << (float)0.f; // unk
-		buffer << (float)1.0f; // unk
-		buffer << s->getCooldown();
-		buffer << (float)0.f; // unk
-		buffer << (uint8)0; // unk
-		buffer << s->getSlot(); 
-		buffer << (uint16)0; // unk
-		buffer << (uint16)0x41e0; // unk
-		buffer << s->getOwner()->x << 55.f << s->getOwner()->y;
-		buffer << (uint64)1; // unk
-	}
+      buffer << (uint32)futureProjNetId; // The projectile ID that will be spawned
+      buffer << x << 55.f << y;
+      buffer << x << 55.f << y;
+      buffer << (uint8)0; // unk
+      buffer << s->getCastTime();
+      buffer << (float)0.f; // unk
+      buffer << (float)1.0f; // unk
+      buffer << s->getCooldown();
+      buffer << (float)0.f; // unk
+      buffer << (uint8)0; // unk
+      buffer << s->getSlot(); 
+      buffer << s->getCost();
+      buffer << s->getOwner()->x << 55.f << s->getOwner()->y;
+      buffer << (uint64)1; // unk
+   }
 };
 
 class PlayerInfo : public BasePacket{
@@ -938,105 +952,160 @@ public:
 
 };
 
+class SpawnParticle : public BasePacket {
+public:
+   SpawnParticle(Champion* owner, Target* t, const std::string& particle) : BasePacket(PKT_S2C_SpawnParticle, owner->getNetId()) {
+      buffer << (uint8)1; // number of particles
+      buffer << owner->getChampionHash();
+      buffer << RAFFile::getHash(particle);
+      buffer << (uint32)0x00000020; // flags ?
+      buffer << (uint32)0; // unk
+      buffer << (uint16)0; // unk
+      buffer << (uint8)1; // number of targets ?
+      buffer << owner->getNetId();
+      buffer << (uint32)0xff000040; // Particle net id ?
+      buffer << owner->getNetId();
+      
+      if(t->isSimpleTarget()) {
+         buffer << (uint32)0;
+      } else {
+         buffer << static_cast<Object*>(t)->getNetId();
+      }
+      
+      buffer << (uint32)0; // unk
+      
+      for(int i = 0; i < 3; ++i) {
+         buffer << static_cast<int16>((t->x - MAP_WIDTH)/2);
+         buffer << 50.f;
+         buffer << static_cast<int16>((t->y - MAP_HEIGHT)/2);
+      }
+      
+      buffer << (uint32)0; // unk
+      buffer << (uint32)0; // unk
+      buffer << (uint32)0; // unk
+      buffer << (uint32)0; // unk
+      buffer << 1.f; // unk
+      
+   }
+};
+
+class DestroyProjectile : public BasePacket {
+public:
+   DestroyProjectile(Projectile* p) : BasePacket(PKT_S2C_DestroyProjectile, p->getNetId()) { }
+};
+
 class UpdateStats : public GamePacket {
 public:
-	UpdateStats(Unit* u) : GamePacket(PKT_S2C_CharStats, u->getNetId()) {
-		const std::multimap<uint8, uint32>& stats = u->getStats().getUpdatedStats();
-
-		std::set<uint8> masks;
-		uint8 masterMask = 0;
-
-		for(auto& p : stats) {
-			masterMask |= p.first;
-			masks.insert(p.first);
-		}
-
-		buffer << (uint8)1;
-		buffer << masterMask;
-		buffer << u->getNetId();
-
-		for(uint8 m : masks) {
-			uint32 mask = 0;
+   UpdateStats(Unit* u) : GamePacket(PKT_S2C_CharStats, 0) {
+      const std::map<uint8, std::set<uint32> >& stats = u->getStats().getUpdatedStats();
+      
+      std::set<uint8> masks;
+      uint8 masterMask = 0;
+      
+      for(auto& p : stats) {
+         masterMask |= p.first;
+         masks.insert(p.first);
+      }
+      
+      buffer << (uint8)1;
+      buffer << masterMask;
+      buffer << u->getNetId();
+      
+      for(uint8 m : masks) {
+         uint32 mask = 0;
          uint8 size = 0;
-
-			for(auto it = stats.lower_bound(m); it != stats.upper_bound(m); ++it) {
-            if(u->getStats().isFloat(m, it->second)) {
-               size += 4;
-            } else {
-               size += 2;
-            }
-            
-				mask |= it->second;
-			}
-
-			buffer << mask;
+         
+         const std::set<uint32>& updatedStats = stats.find(m)->second;
+         
+         for(auto it = updatedStats.begin(); it != updatedStats.end(); ++it) {      
+            size += u->getStats().getSize(m, *it);
+            mask |= *it;
+         }
+         
+         buffer << mask;
          buffer << size;
-
-			for(int i = 0; i < 32; ++i) {
-				uint32 tmpMask = (1 << i);
-				if(tmpMask & mask) {
-               if(u->getStats().isFloat(m, tmpMask)) {
-                  buffer << u->getStats().getStat(m, tmpMask);
-               } else {
+         
+         for(int i = 0; i < 32; ++i) {
+            uint32 tmpMask = (1 << i);
+            if(tmpMask & mask) {
+               if(u->getStats().getSize(m, tmpMask) == 4) {
+                  float f = u->getStats().getStat(m, tmpMask);
+                  unsigned char *c = reinterpret_cast<unsigned char *>(&f);
+                  if(c[0] == 0xFF) {
+                     c[0] = 0xFE;
+                  }
+                  buffer << f;
+               } else if(u->getStats().getSize(m, tmpMask) == 2) {
                   uint16 stat = floor(u->getStats().getStat(m, tmpMask) + 0.5);
                   buffer << stat;
+               } else {
+                  uint8 stat = floor(u->getStats().getStat(m, tmpMask) + 0.5);
+                  buffer << stat;
                }
-				}
-			}
-		}
-	}
+            }
+         }
+      }
+   }
 };
 
 class LevelPropSpawn : public BasePacket {
-public:
-	LevelPropSpawn(LevelProp* lp) : BasePacket(PKT_S2C_LevelPropSpawn) {
-		buffer << lp->getNetId();
-		buffer << (uint32)0x00000040; // unk
-		buffer << (uint8)0; // unk
-		buffer << lp->x << lp->getZ() << lp->y;
-		buffer.fill(0, 41); // unk
-		buffer << lp->getName();
-		buffer.fill(0, 64-lp->getName().length());
-		buffer << lp->getType();
-		buffer.fill(0, 64-lp->getType().length());
-	}
-
-	// TODO : remove this once we find a better solution for jungle camp spawning command
-	LevelPropSpawn(uint32 netId, const std::string& name, const std::string& type, float x, float y, float z) : BasePacket(PKT_S2C_LevelPropSpawn) {
-		buffer << netId;
-		buffer << (uint32)0x00000040; // unk
-		buffer << (uint8)0; // unk
-		buffer << x << z << y;
-		buffer.fill(0, 41); // unk
-		buffer << name;
-		buffer.fill(0, 64-name.length());
-		buffer << type;
-		buffer.fill(0, 64-type.length());
-	}
+    public:
+        LevelPropSpawn(LevelProp* lp) : BasePacket(PKT_S2C_LevelPropSpawn) {
+            buffer << lp->getNetId();
+            buffer << (uint32)0x00000040; // unk
+            buffer << (uint8)0; // unk
+            buffer << lp->x << lp->getZ() << lp->y;
+            buffer.fill(0, 41); // unk
+            buffer << lp->getName();
+            buffer.fill(0, 64-lp->getName().length());
+            buffer << lp->getType();
+            buffer.fill(0, 64-lp->getType().length());
+        }
+        
+        // TODO : remove this once we find a better solution for jungle camp spawning command
+        LevelPropSpawn(uint32 netId, const std::string& name, const std::string& type, float x, float y, float z) : BasePacket(PKT_S2C_LevelPropSpawn) {
+            buffer << netId;
+            buffer << (uint32)0x00000040; // unk
+            buffer << (uint8)0; // unk
+            buffer << x << z << y;
+            buffer.fill(0, 41); // unk
+            buffer << name;
+            buffer.fill(0, 64-name.length());
+            buffer << type;
+            buffer.fill(0, 64-type.length());
+        }
 
 };
 
 struct ViewRequest {
-	uint8 cmd;
-	uint32 unk1;
-	float x;
-	float zoom;
-	float y;
-	float y2;		//Unk
-	uint32 width;	//Unk
-	uint32 height;	//Unk
-	uint32 unk2;	//Unk
-	uint8 requestNo;
+    uint8 cmd;
+    uint32 unk1;
+    float x;
+    float zoom;
+    float y;
+    float y2;		//Unk
+    uint32 width;	//Unk
+    uint32 height;	//Unk
+    uint32 unk2;	//Unk
+    uint8 requestNo;
+};
+
+class LevelUp : public BasePacket {
+public:
+   LevelUp(Champion* c) : BasePacket(PKT_S2C_LevelUp, c->getNetId()) {
+      buffer << c->getStats().getLevel();
+      buffer << c->getSkillPoints();
+   }
 };
 
 class ViewAnswer : public Packet {
 public:
-	ViewAnswer(ViewRequest *request) : Packet(PKT_S2C_ViewAns) {
-		buffer << request->unk1;
-	}
-	void setRequestNo(uint8 requestNo){
-		buffer << requestNo;
-	}
+   ViewAnswer(ViewRequest *request) : Packet(PKT_S2C_ViewAns) {
+      buffer << request->unk1;
+   }
+   void setRequestNo(uint8 requestNo){
+      buffer << requestNo;
+   }
 };
 /* End New Packets */
 

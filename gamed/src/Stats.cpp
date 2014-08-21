@@ -19,7 +19,7 @@ float Stats::getStat(uint8 blockId, uint32 stat) const {
 
 void Stats::setStat(uint8 blockId, uint32 stat, float value) {
    int block = -1;
-   updatedStats.insert(make_pair(blockId, stat));
+   updatedStats[blockId].insert(stat);
    
    while(blockId) {
       blockId = blockId >> 1;
@@ -28,35 +28,35 @@ void Stats::setStat(uint8 blockId, uint32 stat, float value) {
    stats[block][stat] = value;
 }
 
-bool Stats::isFloat(uint8 blockId, uint32 stat) {
+uint8 Stats::getSize(uint8 blockId, uint32 stat) {
    switch(blockId) {
    case MM_One:
       switch(stat) {
       case FM1_SPELL:
-         return false;
+         return 2;
       
       }
       
    case MM_Four:
       switch(stat) {
       case FM4_Level:
-         return false;
+         return 1;
       
       }
    }
 
-   return true;
+   return 4;
 }
 
 void Stats::update(int64 diff) {
-   if(getHp5() > 0 && getCurrentHealth() != getMaxHealth()) {
-      float newHealth = getCurrentHealth()+(getHp5()/5.f)*(diff*0.000001);
+   if(getHp5() > 0 && getCurrentHealth() < getMaxHealth()) {
+      float newHealth = getCurrentHealth()+(getHp5()*diff*0.000001);
       newHealth = std::min(getMaxHealth(), newHealth);
       setCurrentHealth(newHealth);
    }
    
-   if(getMana5() > 0 && getCurrentMana() != getMaxMana()) {
-      float newMana = getCurrentMana()+(getMana5()/5.f)*(diff*0.000001);
+   if(getMana5() > 0 && getCurrentMana() < getMaxMana()) {
+      float newMana = getCurrentMana()+(getMana5()*diff*0.000001);
       newMana = std::min(getMaxMana(), newMana);
       setCurrentMana(newMana);
    }
@@ -66,14 +66,36 @@ void Stats::update(int64 diff) {
    }
 }
 
-void Stats::levelUp(uint32 levelXp) {
+void Stats::levelUp() {
    setLevel(getLevel()+1);
    
    setMaxHealth(getMaxHealth()+healthPerLevel);
+   setCurrentHealth((getMaxHealth() / (getMaxHealth()-healthPerLevel)) * getCurrentHealth());
    setMaxMana(getMaxMana()+manaPerLevel);
+   setCurrentMana((getMaxMana() / (getMaxMana()-manaPerLevel)) * getCurrentMana());
    setBaseAd(getBaseAd()+adPerLevel);
    setArmor(getArmor()+armorPerLevel);
    setMagicArmor(getMagicArmor()+magicArmorPerLevel);
-   
-   setExp(getExp()-levelXp);
+   setHp5(getHp5()+hp5RegenPerLevel);
+   setMp5(getMana5()+mp5RegenPerLevel);
+}
+
+void Stats::applyStatMods(const std::vector<StatMod>& statMods) {
+   for(StatMod stat : statMods) {
+      if(stat.value == 0) {
+         continue;
+      }
+
+      setStat(stat.blockId, stat.mask, getStat(stat.blockId, stat.mask)+stat.value);
+   }
+}
+
+void Stats::unapplyStatMods(const std::vector<StatMod>& statMods) {
+   for(StatMod stat : statMods) {
+      if(stat.value == 0) {
+         continue;
+      }
+
+      setStat(stat.blockId, stat.mask, getStat(stat.blockId, stat.mask)-stat.value);
+   }
 }

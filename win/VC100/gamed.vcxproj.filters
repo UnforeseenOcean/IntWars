@@ -25,6 +25,9 @@
     <Filter Include="ExtLib\RAF">
       <UniqueIdentifier>{0fc0e0d3-5885-4fdd-88ac-8d15e8648ccf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="logic\Items">
+      <UniqueIdentifier>{71491149-ecb1-47f9-9803-46a5502c0a61}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\gamed\include\AI\MinionAI.h">
@@ -55,12 +58,6 @@
       <Filter>logic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\gamed\include\Inventory.h">
-      <Filter>logic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\include\Item.h">
-      <Filter>logic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gamed\include\ItemFactory.h">
       <Filter>logic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\gamed\include\LevelProp.h">
@@ -130,6 +127,12 @@
     <ClInclude Include="..\..\gamed\include\Spell.h">
       <Filter>logic\Characters</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\gamed\include\Item.h">
+      <Filter>logic\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gamed\include\ItemManager.h">
+      <Filter>logic\Items</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\gamed\src\main.cpp" />
@@ -166,9 +169,6 @@
     <ClCompile Include="..\..\gamed\src\SummonersRift.cpp">
       <Filter>logic\Maps</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gamed\src\Item.cpp">
-      <Filter>logic</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\gamed\src\Minion.cpp">
       <Filter>logic\Characters</Filter>
     </ClCompile>
@@ -195,6 +195,12 @@
     </ClCompile>
     <ClCompile Include="..\..\gamed\src\Spell.cpp">
       <Filter>logic\Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\Item.cpp">
+      <Filter>logic\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gamed\src\ItemManager.cpp">
+      <Filter>logic\Items</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

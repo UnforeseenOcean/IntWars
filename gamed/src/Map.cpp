@@ -10,8 +10,6 @@ void Map::update(int64 diff) {
          kv = objects.erase(kv);
          continue;
       }
-   
-      kv->second->update(diff);
       
       if(kv->second->isMovementUpdated()) {
          game->notifyMovement(kv->second);
@@ -19,15 +17,30 @@ void Map::update(int64 diff) {
       }
       
       Unit* u = dynamic_cast<Unit*>(kv->second);
+      
+
+      
+      
       if(!u) {
+         kv->second->update(diff);
          ++kv;
          continue;
       }
       
-      if(u->needsToTeleport == true){
-          game->notifyTeleport(u);
-         
-      }
+    if(u->buffs.size() != 0){
+          
+          for(int i = u->buffs.size(); i>0;i--){
+
+              if(u->buffs[i-1]->needsToRemove()){
+                  u->buffs.erase(u->getBuffs().begin() + (i-1));
+                  //todo move this to Buff.cpp and add every stat
+                  u->getStats().addMovementSpeedPercentageModifier(-u->getBuffs()[i-1]->getMovementSpeedPercentModifier());
+                  continue;
+              }
+              u->buffs[i-1]->update(diff);
+          }
+    }
+      
       
       if(!u->getStats().getUpdatedStats().empty()) {
          game->notifyUpdatedStats(u);
@@ -39,17 +52,12 @@ void Map::update(int64 diff) {
          u->getStats().clearUpdatedHealth();
       }
       
-      Champion* c = dynamic_cast<Champion*>(u);
-      if(!c) {
-         ++kv;
-         continue;
+      if(u->isModelUpdated()) {
+         game->notifyModelUpdate(u);
+         u->clearModelUpdated();
       }
       
-      if(c->getStats().getLevel() < getExpToLevelUp().size() && c->getStats().getExp() >= getExpToLevelUp()[c->getStats().getLevel()]) {
-         printf("Champion %s Levelup to %02.0f\n", c->getType().c_str(), c->getStats().getLevel()+1);
-         c->getStats().levelUp(getExpToLevelUp()[c->getStats().getLevel()]);
-      }
-      
+      kv->second->update(diff);
       ++kv;
    }
 }

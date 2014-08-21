@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Game.h"
 #include "RAFManager.h"
 #include "Inibin.h"
+#include "ItemManager.h"
 
 #define SERVER_HOST ENET_HOST_ANY 
 #define SERVER_PORT 5119
@@ -29,9 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 int main(int argc, char ** argv) 
 {
-   Logging->writeLine("IntWars %s\n",SERVER_VERSION);
-   //printf("Yorick %s\n", SERVER_VERSION);
-   Logging->writeLine("Loading RAF files in filearchives/ ..\n");
+   printf("Yorick %s\n", SERVER_VERSION);
+   puts("Loading RAF files in filearchives/ ..");
    
    std::string basePath = RAFManager::getInstance()->findGameBasePath();
    if(!RAFManager::getInstance()->init(basePath + "filearchives")) {
@@ -40,14 +40,14 @@ int main(int argc, char ** argv)
       return EXIT_FAILURE;
    }
    
-
+   ItemManager::getInstance()->init();
+   
+   puts("Game started");
 
 	Game g;
 	ENetAddress address;
 	address.host = SERVER_HOST;
 	address.port = SERVER_PORT;
-   
-   
 
 	if(!g.initialize(&address, SERVER_KEY))
 	{

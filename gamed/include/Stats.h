@@ -2,6 +2,7 @@
 #define __H_STATS
 
 #include <map>
+#include <set>
 #include <algorithm>
 
 #include "stdafx.h"
@@ -56,35 +57,65 @@ enum FieldMaskFive : uint32
 {
 };
 
+struct StatMod {
+   uint8 blockId;
+   uint32 mask;
+   float value;
+};
+
 class Stats {
 
 protected:
    std::map<uint32, float> stats[5];
-   std::multimap<uint8, uint32> updatedStats;
+   std::map<uint8, std::set<uint32> > updatedStats;
    bool updatedHealth;
    
    // Here all the stats that don't have a bitmask
    float goldPerSecond;
    float healthPerLevel, manaPerLevel;
    float adPerLevel, armorPerLevel, magicArmorPerLevel;
+   float hp5RegenPerLevel, mp5RegenPerLevel;
+   float movementSpeedPercentageModifier;
+   
+   float baseMovement;
+   
    
 public:
 
-   Stats() : updatedHealth(false), goldPerSecond(0), healthPerLevel(0), manaPerLevel(0), adPerLevel(0), armorPerLevel(0), magicArmorPerLevel(0) { }
+   Stats() : updatedHealth(false), goldPerSecond(0), healthPerLevel(0), manaPerLevel(0), adPerLevel(0), armorPerLevel(0), magicArmorPerLevel(0),
+             hp5RegenPerLevel(0), mp5RegenPerLevel(0), movementSpeedPercentageModifier(0), baseMovement(0) { }
 
    float getStat(uint8 blockId, uint32 stat) const;
    void setStat(uint8 blockId, uint32 stat, float value);
 
-   const std::multimap<uint8, uint32>& getUpdatedStats() const { return updatedStats; }
+   const std::map<uint8, std::set<uint32> >& getUpdatedStats() const { return updatedStats; }
    void clearUpdatedStats() { updatedStats.clear(); }
    
    bool isUpdatedHealth() const { return updatedHealth; }
    void clearUpdatedHealth() { updatedHealth = false; }
    
    void update(int64 diff);
-   void levelUp(uint32 levelXp);
+   void levelUp();
    
-   virtual bool isFloat(uint8 blockId, uint32 stat);
+   void applyStatMods(const std::vector<StatMod>& statMods);
+   void unapplyStatMods(const std::vector<StatMod>& statMods);
+   
+   virtual uint8 getSize(uint8 blockId, uint32 stat);
+   
+   virtual float getMovementSpeedPercentageModifier() const{
+       return 1.0 + (movementSpeedPercentageModifier/100.0);
+   }
+   
+   void setBaseMovementSpeed(float ms){
+       baseMovement = ms;
+       setStat(MM_Four, FM4_Speed, baseMovement*getMovementSpeedPercentageModifier());
+   }
+   
+   void addMovementSpeedPercentageModifier(float amount){
+
+       movementSpeedPercentageModifier += amount;
+       setStat(MM_Four, FM4_Speed, baseMovement*getMovementSpeedPercentageModifier());
+   }
 
    virtual float getBaseAd() const {
       return getStat(MM_Two, FM2_Base_Ad);
@@ -146,8 +177,11 @@ public:
       return getStat(MM_Two, FM2_Mp5);
    }
    
+  
+   
    virtual float getMovementSpeed() const {
-      return getStat(MM_Four, FM4_Speed);
+ //  printf("Movement speed with buffs %f \n", getMovementSpeedPercentageModifier() * getStat(MM_Four, FM4_Speed));
+   return getStat(MM_Four, FM4_Speed);
    }
    
    virtual float getBaseAttackSpeed() const {
@@ -166,8 +200,8 @@ public:
       return goldPerSecond;
    }
    
-   virtual float getLevel() {
-      return getStat(MM_Four, FM4_Level);
+   virtual uint8 getLevel() {
+      return floor(getStat(MM_Four, FM4_Level)+0.5f);
    }
    
    virtual float getExp() {
@@ -284,6 +318,14 @@ public:
       magicArmorPerLevel = magicArmor;
    }
    
+   virtual void setHp5RegenPerLevel(float hpRegen) {
+      hp5RegenPerLevel = hpRegen;
+   }
+   
+   virtual void setMp5RegenPerLevel(float mpRegen) {
+      mp5RegenPerLevel = mpRegen;
+   }
+   
    /**
     * Meta-stats, relying on other stats
     */
@@ -294,6 +336,10 @@ public:
     
     float getTotalAttackSpeed() const {
       return getBaseAttackSpeed()*getAttackSpeedMultiplier();
+    }
+    
+    float getTotalMovementSpeed() const {
+        return getMovementSpeedPercentageModifier() * baseMovement;
     }
 
 };
