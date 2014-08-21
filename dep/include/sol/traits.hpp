@@ -151,7 +151,7 @@ struct check_deducible_signature {
     template<class>
     static auto test(...) -> struct nat;
 
-    using type = std::is_void<decltype(test<F>(0))>;
+    using type = std::is_void<F>;
 };
 } // detail
 

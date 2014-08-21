@@ -298,8 +298,8 @@ public:
       buffer << (uint8)2; // coordCount
       buffer << m->getNetId();
       buffer << (uint8)0; // movement mask
-      buffer << MovementVector::targetXToNormalFormat(m->getX());
-      buffer << MovementVector::targetYToNormalFormat(m->getY());
+      buffer << MovementVector::targetXToNormalFormat(m->x);
+      buffer << MovementVector::targetYToNormalFormat(m->y);
    }
 };
 
@@ -883,7 +883,7 @@ public:
       buffer << (uint8)0; // unk
       buffer << s->getSlot(); 
       buffer << s->getCost();
-      buffer << s->getOwner()->getX() << 55.f << s->getOwner()->getY();
+      buffer << s->getOwner()->x << 55.f << s->getOwner()->y;
       buffer << (uint64)1; // unk
    }
 };
@@ -975,9 +975,9 @@ public:
       buffer << (uint32)0; // unk
       
       for(int i = 0; i < 3; ++i) {
-         buffer << static_cast<int16>((t->getX() - MAP_WIDTH)/2);
+         buffer << static_cast<int16>((t->x - MAP_WIDTH)/2);
          buffer << 50.f;
-         buffer << static_cast<int16>((t->getY() - MAP_HEIGHT)/2);
+         buffer << static_cast<int16>((t->y - MAP_HEIGHT)/2);
       }
       
       buffer << (uint32)0; // unk
@@ -1054,7 +1054,7 @@ class LevelPropSpawn : public BasePacket {
             buffer << lp->getNetId();
             buffer << (uint32)0x00000040; // unk
             buffer << (uint8)0; // unk
-            buffer << lp->getX() << lp->getZ() << lp->getY();
+            buffer << lp->x << lp->getZ() << lp->y;
             buffer.fill(0, 41); // unk
             buffer << lp->getName();
             buffer.fill(0, 64-lp->getName().length());

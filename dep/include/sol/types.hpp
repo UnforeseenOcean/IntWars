@@ -24,7 +24,7 @@
 
 #include <lua.hpp>
 #include <string>
-#include "traits.hpp"
+//#include "traits.hpp"
 
 // Is noexcept supported?
 #ifndef _MSC_VER

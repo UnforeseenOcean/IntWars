@@ -305,7 +305,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
    ChatMessage *message = reinterpret_cast<ChatMessage *>(packet->data);
    //Lets do commands
    if(message->msg == '.') {
-      const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn", ".size", ".junglespawn", ".skillpoints", ".level" };
+      const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn", ".size", ".junglespawn", ".skillpoints", ".level", ".announce" };
       
       // help command
 		if (strncmp(message->getMessage(), cmd[9], strlen(cmd[9])) == 0)
@@ -325,8 +325,8 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
 			SendServerMessage(peer, ".spawn - spawns 3 minions per side\n"
 				".spawnjungle [baron/wolves/red/blue/dragon/wraiths/golems] - Spawns a specific type of jungle monster\n"
 				".skillpoints - Enable all skillpoints (like set to level 18)");
-			SendServerMessage(peer, ".cooldown [spellNo] [value] - Set cooldown of a specific (SpellNo) spell");
-			SendServerMessage(peer, ".announce - Calls the announcer");
+			SendServerMessage(peer, ".level [value] - sets champion to [value] level\n"
+				".announce - Calls the announcer");
 
          return true;
       }
@@ -493,19 +493,6 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
          return true;
 			return true;
 
-		}
-
-		//cooldown
-		if(strncmp(message->getMessage(), cmd[14], strlen(cmd[14])) == 0)
-		{
-			uint32 spellNo;
-			float value;
-
-			sscanf(&message->getMessage()[strlen(cmd[14])+1], "%u %f", &spellNo, &value);
-			Spell* s = peerInfo(peer)->getChampion()->GetSpell(spellNo-1);
-			s->setCooldown(s->getLevel(),value);
-
-			return true;
 		}
 
 		//announce

@@ -42,7 +42,8 @@ public:
    virtual ~Unit();
    Stats& getStats() { return *stats; }
    virtual void update(int64 diff);
-   virtual float getMoveSpeed() const {stats->getMovementSpeed(); 
+   virtual float getMoveSpeed() const {
+	   return stats->getMovementSpeed(); 
    }
    
    std::vector<Buff*> buffs;  

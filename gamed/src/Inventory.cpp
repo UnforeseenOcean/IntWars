@@ -1,5 +1,5 @@
-#include "Inventory.h"
 #include "stdafx.h"
+#include "Inventory.h"
 #include "ItemManager.h"
 
 using namespace std;

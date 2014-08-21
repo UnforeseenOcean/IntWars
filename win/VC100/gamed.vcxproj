@@ -104,7 +104,7 @@
     <ClInclude Include="..\..\gamed\include\Game.h" />
     <ClInclude Include="..\..\gamed\include\Inventory.h" />
     <ClInclude Include="..\..\gamed\include\Item.h" />
-    <ClInclude Include="..\..\gamed\include\ItemFactory.h" />
+    <ClInclude Include="..\..\gamed\include\ItemManager.h" />
     <ClInclude Include="..\..\gamed\include\LevelProp.h" />
     <ClInclude Include="..\..\gamed\include\Log.h" />
     <ClInclude Include="..\..\gamed\include\LuaScript.h" />
@@ -144,6 +144,7 @@
     <ClCompile Include="..\..\gamed\src\Handlers.cpp" />
     <ClCompile Include="..\..\gamed\src\Inventory.cpp" />
     <ClCompile Include="..\..\gamed\src\Item.cpp" />
+    <ClCompile Include="..\..\gamed\src\ItemManager.cpp" />
     <ClCompile Include="..\..\gamed\src\Log.cpp" />
     <ClCompile Include="..\..\gamed\src\LuaScript.cpp" />
     <ClCompile Include="..\..\gamed\src\main.cpp" />

@@ -107,7 +107,6 @@ struct ClientInfo
    uint16 ribbon;
    uint32 icon;
    uint32 team;
-   ENetPeer* peer;
    
    Champion* champion;
    ENetPeer* peer;

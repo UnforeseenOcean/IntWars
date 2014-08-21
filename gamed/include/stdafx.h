@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <thread>
 #include <chrono>
 #include <sstream>
+#include <vector>
 
 #include <glm/glm.hpp>
 

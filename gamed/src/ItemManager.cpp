@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "ItemManager.h"
 #include "RAFManager.h"
 #include "Inibin.h"
