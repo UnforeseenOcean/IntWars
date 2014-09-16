@@ -147,6 +147,7 @@
     <ClCompile Include="..\..\gamed\src\ItemManager.cpp" />
     <ClCompile Include="..\..\gamed\src\Log.cpp" />
     <ClCompile Include="..\..\gamed\src\LuaScript.cpp" />
+    <ClCompile Include="..\..\gamed\src\LuaUnit.cpp" />
     <ClCompile Include="..\..\gamed\src\main.cpp" />
     <ClCompile Include="..\..\gamed\src\Map.cpp" />
     <ClCompile Include="..\..\gamed\src\Minion.cpp" />
