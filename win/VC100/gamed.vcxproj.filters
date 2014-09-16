@@ -202,5 +202,8 @@
     <ClCompile Include="..\..\gamed\src\ItemManager.cpp">
       <Filter>logic\Items</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\gamed\src\LuaUnit.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

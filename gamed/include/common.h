@@ -30,18 +30,21 @@ enum PacketCmd : uint8
 {                                            
    PKT_KeyCheck = 0x00, 
    PKT_S2C_RemoveItem = 0x0B,
+   PKT_S2C_Melee_AutoAttack = 0x0C,
 
    PKT_S2C_EndSpawn = 0x11,
    PKT_C2S_QueryStatusReq = 0x14,
    PKT_S2C_SkillUp = 0x15,
    PKT_C2S_Ping_Load_Info = 0x16,
    PKT_S2C_AutoAttack = 0x1A,
+   PKT_S2C_EditBuff = 0x1C,//unsure
    PKT_C2S_SwapItems = 0x20,
    
    PKT_S2C_PlayerInfo = 0x2A,
 
    PKT_S2C_ViewAns = 0x2C,
    PKT_C2S_ViewReq = 0x2E,
+   PKT_S2C_ChampionRespawn = 0x2F,
 
    PKT_C2S_SkillUp = 0x39,
    PKT_S2C_SpawnProjectile = 0x3B,
@@ -63,6 +66,7 @@ enum PacketCmd : uint8
    PKT_C2S_AttentionPing = 0x57,
    PKT_S2C_DestroyProjectile = 0x5A,
    PKT_S2C_StartGame = 0x5C,
+   PKT_S2C_ChampionDie = 0x5E,
 
    PKT_S2C_StartSpawn = 0x62,
    PKT_C2S_ClientReady = 0x64,
@@ -72,11 +76,13 @@ enum PacketCmd : uint8
    PKT_S2C_LoadScreenInfo = 0x67,
    PKT_ChatBoxMessage = 0x68,
    PKT_S2C_SetTarget = 0x6A,
-   PKT_S2C_Unk2 = 0x6E,
+   PKT_S2C_ShowProjectile = 0x6E,
    PKT_S2C_BuyItemAns = 0x6F,
+   PKT_S2C_AddBuff = 0xB7,
 
    PKT_C2S_MoveReq = 0x72,
    PKT_C2S_MoveConfirm = 0x77,
+   PKT_S2C_RemoveBuff = 0x7B,
 
    PKT_C2S_LockCamera = 0x81,
    PKT_C2S_BuyItemReq = 0x82,
@@ -88,6 +94,7 @@ enum PacketCmd : uint8
    PKT_S2C_Ping_Load_Info = 0x95,
    PKT_C2S_CastSpell = 0x9A,
    PKT_S2C_TurretSpawn = 0x9D,
+   PKT_S2C_NPC_Die = 0x9E,
 
    PKT_C2S_Surrender = 0xA4,
    PKT_C2S_StatsConfirm = 0xA8, 

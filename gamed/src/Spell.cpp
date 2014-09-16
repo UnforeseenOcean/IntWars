@@ -146,8 +146,8 @@ void Spell::loadLua(LuaScript& script){
    script.lua.script("package.path = '../../lua/lib/?.lua;' .. package.path"); //automatically load vector lib so scripters dont have to worry about path
    script.lua.set_function("getOwnerX", [this]() { return owner->x; });
    script.lua.set_function("getOwnerY", [this]() { return owner->y; });
-      script.lua.set_function("getSpellLevel", [this]() { return getLevel(); });
-   script.lua.set_function("getOwnerLevel", [this]() { return owner->getLevel(); });
+   script.lua.set_function("getSpellLevel", [this]() { return getLevel(); });
+   script.lua.set_function("getOwnerLevel", [this]() { return owner->getStats().getLevel(); });
    script.lua.set_function("getChampionModel", [this]() { return owner->getModel(); });
    
    script.lua.set_function("setChampionModel", [this](const std::string& newModel) {
@@ -162,11 +162,16 @@ void Spell::loadLua(LuaScript& script){
       return;
    });
    
-   script.lua.set_function("addMovementSpeedBuff", [this](Unit* u, float amount, float duration) { // expose teleport to lua
+   /*script.lua.set_function("addMovementSpeedBuff", [this](Unit* u, float amount, float duration) { // expose teleport to lua
        Buff* b = new Buff(duration);
        b->setMovementSpeedPercentModifier(amount);
        u->addBuff(b);
        u->getStats().addMovementSpeedPercentageModifier(b->getMovementSpeedPercentModifier());
+      return;
+   });*/
+   
+      script.lua.set_function("addBuff", [this](Buff b){
+      owner->addBuff(new Buff(b));
       return;
    });
    
@@ -183,6 +188,7 @@ void Spell::loadLua(LuaScript& script){
    script.lua.set_function("isDead", [this](Unit* u) { return u->isDead(); });
    
    script.lua.set_function("getProjectileSpeed", [this]() { return projectileSpeed; });
+   script.lua.set_function("getCoefficient", [this]() { return coefficient; });
    
    script.lua.set_function("addProjectile", [this](float toX, float toY) { 
       Projectile* p = new Projectile(owner->getMap(), GetNewNetID(), owner->x, owner->y, 30, owner, new Target(toX, toY), this, projectileSpeed, RAFFile::getHash(spellName +"Missile"), projectileFlags ? projectileFlags : flags);
@@ -233,7 +239,7 @@ void Spell::loadLua(LuaScript& script){
 
 void Spell::doLua(){
    
-   LuaScript script;
+   LuaScript script(true);
     
    loadLua(script); //comment this line for no reload on the fly, better performance
 
@@ -275,7 +281,7 @@ uint32 Spell::getId() const {
 
 void Spell::applyEffects(Unit* u, Projectile* p) {
 
-   LuaScript script;
+   LuaScript script(true);
    
    script.lua.set_function("getTarget", [&u]() { return u; });
    
@@ -293,6 +299,10 @@ void Spell::applyEffects(Unit* u, Projectile* p) {
       p->setToRemove();
       p->getMap()->getGame()->notifyProjectileDestroy(p);
       return;
+   });
+   
+   script.lua.set_function("getNumberObjectsHit", [this, &p]() { 
+      return p->getObjectsHit().size();
    });
    
    loadLua(script); //comment this line for no reload on the fly, better performance

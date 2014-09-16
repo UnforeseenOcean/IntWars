@@ -305,7 +305,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
    ChatMessage *message = reinterpret_cast<ChatMessage *>(packet->data);
    //Lets do commands
    if(message->msg == '.') {
-      const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn", ".size", ".junglespawn", ".skillpoints", ".level", ".announce" };
+      const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn", ".size", ".junglespawn", ".skillpoints", ".level", ".tp", ".coords"};
       
       // help command
 		if (strncmp(message->getMessage(), cmd[9], strlen(cmd[9])) == 0)
@@ -491,16 +491,6 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
          SkillUpResponse skillUpResponse(peerInfo(peer)->getChampion()->getNetId(), 0, 0, 17);
          sendPacket(peer, skillUpResponse, CHL_GAMEPLAY);
          return true;
-			return true;
-
-		}
-
-		//announce
-		if(strncmp(message->getMessage(), cmd[15], strlen(cmd[15])) == 0)
-		{
-			Announce announcement30SecondsUntilMinions(0x73, 1);
-			broadcastPacket(reinterpret_cast<uint8 *>(&announcement30SecondsUntilMinions), sizeof(announcement30SecondsUntilMinions), CHL_S2C);
-			return true;
       }
       
       // Level
@@ -508,6 +498,21 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
          float data = (float)atoi(&message->getMessage()[strlen(cmd[14])+1]);
 
          peerInfo(peer)->getChampion()->getStats().setLevel(data);
+         return true;
+      }
+      
+      // tp
+      if(strncmp(message->getMessage(), cmd[15], strlen(cmd[15])) == 0) {
+         float x, y;
+         sscanf(&message->getMessage()[strlen(cmd[15])+1], "%f %f", &x, &y);
+
+         notifyTeleport(peerInfo(peer)->getChampion(), x, y);
+         return true;
+      }
+      
+       // coords
+      if(strncmp(message->getMessage(), cmd[16], strlen(cmd[16])) == 0) {
+         printf("At %f;%f\n", peerInfo(peer)->getChampion()->x, peerInfo(peer)->getChampion()->y);
          return true;
 		}
 

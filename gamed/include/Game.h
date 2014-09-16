@@ -91,6 +91,14 @@ class Game
       void notifyItemBought(Champion* c, const ItemInstance* i);
       void notifyItemsSwapped(Champion* c, uint8 fromSlot, uint8 toSlot);
       void notifyRemoveItem(Champion* c, uint8 slot);
+      void notifySetTarget(Unit* attacker, Unit* target);
+      void notifyChampionDie(Champion* die, Unit* killer);
+      void notifyChampionRespawn(Champion* c);
+      void notifyShowProjectile(Projectile* p);
+      void notifyNpcDie(Unit* die, Unit* killer);
+      void notifyAutoAttackMelee(Unit* attacker, Unit* target);
+      void notifyAddBuff(Unit* u, std::string buffName);
+      void notifyRemoveBuff(Unit* u, std::string buffName);
 		// Tools
 		static void printPacket(const uint8 *buf, uint32 len);
 		void printLine(uint8 *buf, uint32 len);

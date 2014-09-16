@@ -518,16 +518,6 @@ struct Click {
 
 };
 
-struct Unk2 {
-	Unk2(uint32 sourceNetId, uint32 targetNetId)  : targetNetId(targetNetId) {
-		header.cmd = PKT_S2C_Unk2;
-		header.netId = sourceNetId;
-	}
-
-	PacketHeader header;
-	uint32 targetNetId;
-};
-
 class HeroSpawn : public Packet {
 public:
 	HeroSpawn(ClientInfo* player, int playerId) : Packet(PKT_S2C_HeroSpawn) {
@@ -691,6 +681,44 @@ typedef struct _EmotionResponse {
 
 /* New Style Packets */
 
+
+class AddBuff : public Packet {
+public:
+   AddBuff(Unit* u, int stacks, std::string name) : Packet(PKT_S2C_AddBuff) {
+      buffer << u->getNetId();//target
+      
+      buffer << (uint8) 0x05; //maybe type?
+      buffer << (uint8) 0x02;
+      buffer << (uint8) 0x01; // stacks
+      buffer << (uint8) 0x00;
+      buffer << RAFFile::getHash(name);
+      buffer << (uint8) 0xde;
+      buffer << (uint8) 0x88;
+      buffer << (uint8) 0xc6;
+      buffer << (uint8) 0xee;
+      buffer << (uint8) 0x00;
+      buffer << (uint8) 0x00;
+      buffer << (uint8) 0x00;
+      buffer << (uint8) 0x00;
+      buffer << (uint8) 0x00;
+      buffer << (uint8) 0x50;
+      buffer << (uint8) 0xc3;
+      buffer << (uint8) 0x46;
+     
+      buffer << u->getNetId();//source?
+   }
+};
+
+class RemoveBuff : public BasePacket {
+public:
+   RemoveBuff(Unit* u, std::string name) : BasePacket(PKT_S2C_RemoveBuff, u->getNetId()) {
+      buffer << (uint8)0x05;
+      buffer << RAFFile::getHash(name);
+      buffer << (uint32) 0x0;
+      //buffer << u->getNetId();//source?
+   }
+};
+
 class DamageDone : public BasePacket {
 public:
 	DamageDone(Unit* source, Unit* target, float amount) : BasePacket(PKT_S2C_DamageDone, target->getNetId()) {
@@ -699,6 +727,17 @@ public:
 		buffer << source->getNetId();
 		buffer << amount;
 	}
+};
+
+class NpcDie : public BasePacket {
+public:
+   NpcDie(Unit* die, Unit* killer) : BasePacket(PKT_S2C_NPC_Die, die->getNetId()) {
+      buffer << killer->getNetId();
+      buffer << (uint32)0; // unk
+      buffer << (uint32)7; // unk
+      buffer << (uint16)0; // unk
+      buffer << (uint32)0xE80000B3; // unk
+   }
 };
 
 class LoadScreenPlayerName : public Packet {
@@ -796,17 +835,57 @@ public:
 		buffer << attacked->getNetId();
       buffer << (uint8)0x80; // unk
       buffer << futureProjNetId; // Basic attack projectile ID, to be spawned later
-      buffer << (uint8)0x40; // unk
+      buffer << (uint8)0x40; // unk -- seems to be flags related to things like critical strike (0x49)
       buffer << attacker->x << attacker->y;
+   }
+};
+
+class AutoAttackMelee : public BasePacket {
+public:
+   AutoAttackMelee(Unit* attacker, Unit* attacked) : BasePacket(PKT_S2C_Melee_AutoAttack, attacker->getNetId()) {
+      buffer << attacked->getNetId();
+      buffer << (uint16)0; // unk
+      buffer << (uint16)1; // unk
+      buffer << (uint8)0x40; // unk
+      buffer << (uint8)0x40; // unk
    }
 };
 
 class SetTarget : public BasePacket {
 public:
-	SetTarget(Unit* attacker, Unit* attacked) : BasePacket(PKT_S2C_SetTarget, attacker->getNetId()) {
-		buffer << attacked->getNetId();
-	}
+   SetTarget(Unit* attacker, Unit* attacked) : BasePacket(PKT_S2C_SetTarget, attacker->getNetId()) {
+      if (attacked != 0) {
+         buffer << attacked->getNetId();
+      } else {
+         buffer << (uint32)0;
+      }
+   }
 
+};
+
+class ChampionDie : public BasePacket {
+public:
+   ChampionDie(Champion* die, Unit* killer) : BasePacket(PKT_S2C_ChampionDie, die->getNetId()) {
+      buffer << killer->getNetId();
+      buffer << (uint32)0; // unk
+      buffer << (uint32)7; // unk
+      buffer << die->getRespawnTimer()/1000000.f; // Respawn timer
+      buffer << (uint16)0x9F00; // unk
+   }
+};
+
+class ChampionRespawn : public BasePacket {
+public:
+   ChampionRespawn(Champion* c) : BasePacket(PKT_S2C_ChampionRespawn, c->getNetId()) {
+      buffer << c->x << 230.f << c->y;
+   } 
+};
+
+class ShowProjectile : public BasePacket {
+public:
+   ShowProjectile(Projectile* p) : BasePacket(PKT_S2C_ShowProjectile, p->getOwner()->getNetId()) {
+      buffer << p->getNetId();
+   }
 };
 
 class SetHealth : public BasePacket {

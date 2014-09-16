@@ -13,6 +13,8 @@ public:
    
    virtual bool isSimpleTarget() { return true; }
 
+   void setPosition(float x, float y) { this->x = x; this->y = y; }
+
    float distance(glm::vec2 t)
    {
 	   return glm::distance((glm::vec2)*this,t);
