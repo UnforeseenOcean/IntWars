@@ -1,7 +1,8 @@
 IntWars
 ==================
-DISCLAIMER: This is for development purposes only, this is not a finished project - and should not be used in a production enviroment.
-About
+**DISCLAIMER: This repo died! Its too hard to keep Visual Studio support with all that not supported C++11 functions. Tell MS to fully support C++11 and we will keep the Visual Studio support. For now, keep a look at Elyotna's repo (https://github.com/Elyotna/IntWars). Its the most up to date repo and the one with most support.**
+
+
 ------
 New: Website to provide a central location to discuss the project! http://leaguesandbox.com/
 
